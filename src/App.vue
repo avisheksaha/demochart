@@ -1,6 +1,6 @@
 <template>
   <div id="app">
-    <nav
+    <!-- <nav
       class="navbar sticky-top navbar-expand-lg bg-light border-bottom fixed"
     >
       <a class="navbar-brand" href="#">Navbar</a>
@@ -36,7 +36,7 @@
           </form>
         </div>
       </div>
-    </nav>
+    </nav>-->
     <div>
       <router-view></router-view>
       <!-- <Dashboard></Dashboard> -->

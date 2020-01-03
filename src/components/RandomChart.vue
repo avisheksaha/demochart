@@ -1,15 +1,14 @@
 <template>
-  <div class="container-fluid">
+  <div class="container-fluid mb-2">
     <!-- {{gotStates}} -->
     <div class="row px-3 pb-4">
       <div class="col-md-4">
-        <label class="my-1 mr-2" for="inlineFormCustomSelectPref"
-          >Select State</label
-        >
+        <label class="my-1 mr-2 text-white" for="inlineFormCustomSelectPref">Select State</label>
         <div v-if="gotStates.length > 0">
           <select
             class="custom-select my-1 mr-sm-2"
             v-model="selectState"
+            @change="stateSelected(selectState.id)"
             id="inlineFormCustomSelectPref"
           >
             <option selected>Choose...</option>
@@ -17,19 +16,16 @@
               v-for="(gotState, index) in gotStates"
               :key="index"
               :value="gotState"
-              >{{ gotState.name }}</option
-            >
+            >{{ gotState.name }}</option>
           </select>
         </div>
       </div>
       <div class="col-md-4" v-if="selectState">
-        <label class="my-1 mr-2" for="inlineFormCustomSelectPref"
-          >Select Districts</label
-        >
+        <label class="my-1 mr-2" for="inlineFormCustomSelectPref">Select Districts</label>
         <select
           class="custom-select my-1 mr-sm-2"
           v-model="selectDistrict"
-          @change="stateSelected(selectDistrict)"
+          @change="districtSelected(selectDistrict)"
           id="inlineFormCustomSelectPref"
         >
           <option selected>Choose...</option>
@@ -37,49 +33,72 @@
             v-for="(district, index) in selectState.districts"
             :key="index"
             :value="district"
-            >{{ district }}</option
-          >
+          >{{ district }}</option>
         </select>
       </div>
     </div>
     <div class="row">
-      <div class="col-md-3">
-        <div class="card bg-dark">
-          <div class="card-body text-white">
-            <h6>Total number of Small Growers in {{ this.xyz.district }}</h6>
-            <h2 class="mt-5">{{ this.xyz.Grower_count }}</h2>
+      <div class="col-md-5" style="padding-right:0px !important;">
+        <div class="row">
+          <div class="col-md-6" style="padding-right:0px !important;">
+            <div class="card bg-dark">
+              <div
+                class="card-body text-white"
+                style="padding-top:10px !important; padding-bottom:5px !important;"
+              >
+                <h6>Total number of Small Growers</h6>
+                <h2 v-if="this.xyz.Grower_count > 0" class="mt-5">{{this.xyz.Grower_count}}</h2>
+                <h2 class="mt-5" v-else>{{this.xyzState.Grower_count}}</h2>
+                <!-- <h2 class="mt-4">{{ this.xyzState.Grower_count }}</h2> -->
+              </div>
+            </div>
+          </div>
+          <div class="col-md-6" style="padding-left:5px !important;">
+            <div class="card bg-dark">
+              <div
+                class="card-body text-white"
+                style="padding-top:10px !important; padding-bottom:5px !important;"
+              >
+                <h6>Total area under plantation of STG</h6>
+                <!-- <h6>of STG in {{ this.xyz.district }}</h6> -->
+                <h2
+                  v-if="this.xyz.total_plantation > 0"
+                  class="mt-5"
+                >{{ this.xyz.total_plantation }} ha</h2>
+                <h2 class="mt-5" v-else>{{this.xyzState.total_plantation}}</h2>
+              </div>
+            </div>
           </div>
         </div>
-      </div>
-      <div class="col-md-3">
-        <div class="card bg-dark">
-          <div class="card-body text-white">
-            <h6>Total area under tea plantation of STG</h6>
-            <h2 class="mt-5">{{ this.xyz.total_plantation }} ha</h2>
-          </div>
+        <div class="card bg-dark" style="margin-top: 4px;">
+          <barareavsgrower-chart
+            :chart-data="datacollectionBarAreaVsGrowerCode"
+            :options="optionsbarareavsgrower"
+            :height="380"
+          ></barareavsgrower-chart>
         </div>
       </div>
-      <div class="col-md-3">
-        <div class="card bg-dark">
-          <div class="card-body text-white">
-            <h6>Total factories in {{ this.xyz.district }}</h6>
-            <h2 class="mt-5">{{ this.factoryCount }}</h2>
-          </div>
-        </div>
-      </div>
-      <div class="col-md-3">
-        <div class="card bg-dark">
-          <div class="card-body text-white">
-            <h6>Total made Tea yesterday</h6>
-            <h2 class="mt-5">23345 kg</h2>
-          </div>
+      <div class="col-md-7" style="padding-left: 5px !important;">
+        <div style="height: 100%;">
+          <l-map style="height: 100%; width: 100%" :zoom="zoom" :center="center">
+            <l-tile-layer :url="url" :attribution="attribution"></l-tile-layer>
+            <l-marker :lat-lng="markerLatLng"></l-marker>
+          </l-map>
         </div>
       </div>
     </div>
-
-    <div class="row mt-2 mb-2">
-      <div class="col-md-6">
-        <div class="card p-4 bg-dark">
+    <div class="row" style="padding-top:5px;">
+      <div class="col-md-3" style="padding-right:0px !important;">
+        <div class="card bg-dark px-4" style="height:360px;">
+          <doughnutmalefemale-chart
+            :chart-data="datacollectionDoughnutMaleFemale"
+            :options="options"
+            :height="350"
+          ></doughnutmalefemale-chart>
+        </div>
+      </div>
+      <div class="col-md-3" style="padding-right:0px !important; padding-left:5px !important;">
+        <div class="card p-4 bg-dark" style="height:360px;">
           <barqrcode-chart
             :chart-data="datacollectionBarQrCode"
             :options="optionsbar"
@@ -87,44 +106,32 @@
           ></barqrcode-chart>
         </div>
       </div>
-      <div class="col-md-6">
-        <div style="height: 100%;">
-          <l-map
-            style="height: 100%; width: 100%"
-            :zoom="zoom"
-            :center="center"
-          >
-            <l-tile-layer :url="url" :attribution="attribution"></l-tile-layer>
-            <l-marker :lat-lng="markerLatLng"></l-marker>
-          </l-map>
-        </div>
-      </div>
-    </div>
-
-    <div class="row mb-2">
-      <div class="col-md-4">
-        <div class="card p-4 bg-dark">
-          <doughnutmalefemale-chart
-            :chart-data="datacollectionDoughnutMaleFemale"
-            :options="options"
-          ></doughnutmalefemale-chart>
-        </div>
-      </div>
-      <div class="col-md-4">
-        <div class="card p-4 bg-dark">
+      <div class="col-md-3" style="padding-right:0px !important; padding-left:5px !important;">
+        <div class="card bg-dark px-4 pb-2" style="height:360px;">
           <doughnutcaste-chart
             :chart-data="datacollectionDoughnutCaste"
             :options="optionssemidough"
+            :height="350"
           ></doughnutcaste-chart>
         </div>
       </div>
-      <div class="col-md-4">
-        <div class="card p-4 bg-dark">
-          <barareavsgrower-chart
-            :chart-data="datacollectionBarAreaVsGrowerCode"
-            :options="optionsbarareavsgrower"
-            :height="306"
-          ></barareavsgrower-chart>
+      <div class="col-md-3" style="padding-left:5px !important;">
+        <div class="card bg-dark" style="height:360px;">
+          <div
+            class="card-body text-white"
+            style="padding-top:10px !important; padding-bottom:5px !important;"
+          >
+            <h6>Total factories</h6>
+            <h2 v-if="this.factoryCtg.total > 0" class="mt-4">{{ this.factoryCtg.total }}</h2>
+            <h2 class="mt-4" v-else>{{ this.factoryCtgState.total }}</h2>
+            <div class="card bg-dark px-4 pb-2">
+              <piefactorycatg-chart
+                :chart-data="datacollectionFactoryCatgPie"
+                :options="optionspie"
+                :height="220"
+              ></piefactorycatg-chart>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -144,13 +151,14 @@ import DoughnutmalefemaleChart from "./charts/DoughnutmalefemaleChart.js";
 import BarqrcodeChart from "./charts/BarqrcodeChart.js";
 import BarareavsgrowerChart from "./charts/BarareavsgrowerChart.js";
 import DoughnutcasteChart from "./charts/DoughnutcasteChart.js";
+import PiefactorycatgChart from "./charts/PiefactorycatgChart.js";
 
 // import DoughnutfactoryChart from "./charts/DoughnutfactoryChart.js";
 
 const options = {
   responsive: true,
-  maintainAspectRatio: true,
-  cutoutPercentage: 50,
+  maintainAspectRatio: false,
+  cutoutPercentage: 65,
 
   animation: {
     animateRotate: true,
@@ -201,6 +209,13 @@ const optionsbar = {
         }
       }
     ]
+  },
+  title: {
+    display: true,
+    fontColor: "white",
+    fontSize: 14,
+    fontFamily: "'Helvetica Neue',Helvetica, Arial, sans-serif",
+    text: "QR code generation progress"
   }
 };
 
@@ -241,13 +256,20 @@ const optionsbarareavsgrower = {
         }
       }
     ]
+  },
+  title: {
+    display: true,
+    fontColor: "white",
+    fontSize: 14,
+    fontFamily: "'Helvetica Neue',Helvetica, Arial, sans-serif"
+    // text: "Number of growers under certain area of plantation "
   }
 };
 
 const optionssemidough = {
   responsive: true,
-  maintainAspectRatio: true,
-  cutoutPercentage: 50,
+  maintainAspectRatio: false,
+  cutoutPercentage: 70,
 
   animation: {
     animateRotate: true,
@@ -270,6 +292,30 @@ const optionssemidough = {
     text: "Grower Caste-wise Distribution"
   }
 };
+
+const optionspie = {
+  responsive: true,
+  maintainAspectRatio: false,
+  animation: {
+    animateRotate: true,
+    animateScale: true
+  },
+  legend: {
+    // position: "right",
+    labels: {
+      // This more specific font property overrides the global property
+      fontColor: "white"
+    }
+  },
+  title: {
+    display: true,
+    fontColor: "white",
+    fontSize: 14,
+    fontFamily: "'Helvetica Neue',Helvetica, Arial, sans-serif",
+    text: "Factory Category"
+  }
+};
+
 export default {
   components: {
     LMap,
@@ -281,7 +327,8 @@ export default {
     DoughnutmalefemaleChart,
     BarqrcodeChart,
     BarareavsgrowerChart,
-    DoughnutcasteChart
+    DoughnutcasteChart,
+    PiefactorycatgChart
     // DoughnutfactoryChart
   },
   data() {
@@ -292,8 +339,8 @@ export default {
       attribution:
         '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors',
       zoom: 12,
-      center: [47.41322, -1.219482],
-      markerLatLng: [47.31322, -1.219482],
+      center: [28.6139, 77.209],
+      markerLatLng: [28.6139, 77.209],
 
       selectState: null,
       selectDistrict: null,
@@ -302,6 +349,7 @@ export default {
       optionsbar,
       optionsbarareavsgrower,
       optionssemidough,
+      optionspie,
       // datacollectionLine: null,
       // datacollectionBar: null,
       // datacollectionPie: null,
@@ -309,10 +357,32 @@ export default {
       datacollectionBarQrCode: null,
       datacollectionDoughnutCaste: null,
       datacollectionBarAreaVsGrowerCode: null,
+      datacollectionFactoryCatgPie: null,
       gotStates: [],
-      xyz: {},
+      xyz: {
+        Grower_count: 0,
+        total_plantation: 0
+      },
+      xyzState: {
+        Grower_count: 0,
+        total_plantation: 0
+      },
       factoryCount: 0,
-      district_name: ""
+      factoryCountState: 0,
+      district_name: "",
+      state_name: "",
+      factoryCtg: {
+        total: 0,
+        blf: 0,
+        ef: 0,
+        it: 0
+      },
+      factoryCtgState: {
+        total: 0,
+        blf: 0,
+        ef: 0,
+        it: 0
+      }
     };
   },
   mounted() {
@@ -320,27 +390,179 @@ export default {
     // this.fillDataBar();
     // this.fillDataPie();
     this.receiveStates();
+
     // this.fillDataDoughnut();
   },
   methods: {
     receiveStates() {
       this.axios
-        .get("http://a50cec0d.ngrok.io/api/v1/state-list")
+        .get("http://f31c36df.ngrok.io/api/v1/state-list")
         .then(response => {
           this.gotStates = response.data.data;
         })
         .catch();
     },
+    stateSelected(selectState) {
+      this.getMaleFemaleCountState(selectState);
+      this.getFactoryCountState(selectState);
+      this.factoryCatgState(selectState);
+    },
+    getMaleFemaleCountState(selectState) {
+      this.axios
+        .get(`http://f31c36df.ngrok.io/api/v1/state/${selectState}`)
+        .then(response => {
+          this.xyzState = response.data.data;
+          this.state_name = response.data.state;
+          this.datacollectionDoughnutMaleFemale = {
+            labels: ["Male", "Female"],
+            datasets: [
+              {
+                label: "Data One",
+                backgroundColor: ["#B83125", "#027585"],
+                data: [this.xyzState.Male_count, this.xyzState.Female_count]
+              }
+            ]
+          };
+          this.datacollectionBarQrCode = {
+            labels: [
+              "Pending",
+              "Processing",
+              "On-Print",
+              "Downloaded",
+              "Dispatched",
+              "Printed"
+            ],
+            datasets: [
+              {
+                label: "QR code generation Progress",
+                backgroundColor: [
+                  "#2E9CA6",
+                  "#DC3F76",
+                  "#7446B9",
+                  "#C0C0C0",
+                  "#F96232",
+                  "#9FB328"
+                ],
+                pointBackgroundColor: "white",
+                borderWidth: 1,
+                pointBorderColor: "#249EBF",
+                data: [
+                  this.xyzState.pending,
+                  this.xyzState.processing,
+                  this.xyzState.onprint,
+                  this.xyzState.downloaded,
+                  this.xyzState.dispatched,
+                  this.xyzState.printed
+                ]
+              }
+            ]
+          };
+          this.datacollectionBarAreaVsGrowerCode = {
+            labels: ["0-2 ha", "2.1-4 ha", "4.1-6 ha", "6.1-8 ha", "8.1-10.2"],
+            datasets: [
+              {
+                label: "Number of growers under certain area of Plantation",
+                backgroundColor: [
+                  "#4A759E",
+                  "#4A759E",
+                  "#4A759E",
+                  "#4A759E",
+                  "#4A759E"
+                ],
+                pointBackgroundColor: "white",
+                borderWidth: 1,
+                pointBorderColor: "#249EBF",
+                data: [
+                  this.xyzState.uptoTwo,
+                  this.xyzState.uptoFour,
+                  this.xyzState.uptoSix,
+                  this.xyzState.uptoEight,
+                  this.xyzState.uptoTen
+                ]
+              }
+            ]
+          };
+          this.datacollectionDoughnutCaste = {
+            labels: ["ST", "SC", "OBC", "MOBC", "GEN"],
+            datasets: [
+              {
+                label: "Data One",
+                backgroundColor: [
+                  "#2E9CA6",
+                  "#DC3F76",
+                  "#7446B9",
+                  "#C0C0C0",
+                  "#F96232"
+                ],
+                data: [
+                  this.xyzState.ST,
+                  this.xyzState.SC,
+                  this.xyzState.OBC,
+                  this.xyzState.MOBC,
+                  this.xyzState.GEN
+                ]
+              }
+            ]
+          };
+          this.center = this.xyzState.location;
+          this.markerLatLng = this.xyzState.location;
+        })
+        .catch();
+    },
+    getFactoryCountState(selectState) {
+      this.axios
+        .get(`http://f31c36df.ngrok.io/api/v1/factory-count/${selectState}`)
+        .then(response => {
+          console.log("dsdsds");
+          this.factoryCountState = response.data.data;
+          // this.datacollectionDoughnutFactory = {
+          //   labels: ["Factory Count"],
+          //   datasets: [
+          //     {
+          //       label: "Data One",
+          //       backgroundColor: ["#B83125", "#027585"],
+          //       data: [this.factoryCount]
+          //     }
+          //   ]
+          // };
+        })
+        .catch();
+    },
+    factoryCatgState(selectState) {
+      this.axios
+        .get(
+          `http://f31c36df.ngrok.io/api/v1/state/factory-category/${selectState}`
+        )
+        .then(response => {
+          this.factoryCtgState = response.data.data;
+          this.datacollectionFactoryCatgPie = {
+            labels: ["BLF", "EF", "IT"],
+            datasets: [
+              {
+                label: "Data One",
+                backgroundColor: ["#CD5C5C", "#a9c722", "#c77722"],
+                data: [
+                  this.factoryCtgState.BLF,
+                  this.factoryCtgState.EF,
+                  this.factoryCtgState.IT
+                ]
+              }
+            ]
+          };
+        })
+        .catch();
+    },
 
-    stateSelected(selectDistrict) {
+    districtSelected(selectDistrict) {
       this.getMaleFemaleCount(selectDistrict);
       this.getFactoryCount(selectDistrict);
+      this.factoryCatg(selectDistrict);
     },
     getMaleFemaleCount(selectDistrict) {
       // `http://4077d282.ngrok.io/api/v1/district/${selectDistrict}`
       // "http://helloWorld.test/api/malefemale"
       this.axios
-        .get(`http://a50cec0d.ngrok.io/api/v1/district/${selectDistrict}`)
+        .get(`http://f31c36df.ngrok.io/api/v1/district/${selectDistrict}`)
         .then(response => {
           this.xyz = response.data.data;
           this.district_name = response.data.district;
@@ -392,7 +614,7 @@ export default {
             labels: ["0-2 ha", "2.1-4 ha", "4.1-6 ha", "6.1-8 ha", "8.1-10.2"],
             datasets: [
               {
-                label: "Data One",
+                label: "Number of growers under certain area of Plantation",
                 backgroundColor: [
                   "#4A759E",
                   "#4A759E",
@@ -435,6 +657,8 @@ export default {
               }
             ]
           };
+          this.center = this.xyz.location;
+          this.markerLatLng = this.xyz.location;
         })
         .catch();
     },
@@ -442,7 +666,7 @@ export default {
       // `http://4077d282.ngrok.io/api/v1/factory-count/${selectDistrict}`
       // "http://helloWorld.test/api/factory"
       this.axios
-        .get(`http://a50cec0d.ngrok.io/api/v1/factory-count/${selectDistrict}`)
+        .get(`http://f31c36df.ngrok.io/api/v1/factory-count/${selectDistrict}`)
         .then(response => {
           console.log("dsdsds");
           this.factoryCount = response.data.data;
@@ -456,6 +680,30 @@ export default {
           //     }
           //   ]
           // };
+        })
+        .catch();
+    },
+    factoryCatg(selectDistrict) {
+      this.axios
+        .get(
+          `http://f31c36df.ngrok.io/api/v1/district/factory-category/${selectDistrict}`
+        )
+        .then(response => {
+          this.factoryCtg = response.data.data;
+          this.datacollectionFactoryCatgPie = {
+            labels: ["BLF", "EF", "IT"],
+            datasets: [
+              {
+                label: "Data One",
+                backgroundColor: ["#CD5C5C", "#a9c722", "#c77722"],
+                data: [
+                  this.factoryCtg.BLF,
+                  this.factoryCtg.EF,
+                  this.factoryCtg.IT
+                ]
+              }
+            ]
+          };
         })
         .catch();
     }
@@ -472,24 +720,7 @@ export default {
     //     ]
     //   };
     // },
-    // fillDataBar() {
-    //   this.datacollectionBar = {
-    //     labels: ["January", "February", "March", "April", "May"],
-    //     datasets: [
-    //       {
-    //         label: "Data One",
-    //         backgroundColor: [
-    //           "#CD5C5C",
-    //           "#a9c722",
-    //           "#c77722",
-    //           "#22c738",
-    //           "#d667c4"
-    //         ],
-    //         data: [40, 39, 20, 40, 39]
-    //       }
-    //     ]
-    //   };
-    // },
+
     // fillDataPie() {
     //   this.datacollectionPie = {
     //     labels: ["January", "February", "March", "April", "May"],
@@ -508,15 +739,6 @@ export default {
     //     ]
     //   };
     // },
-
-    // receiveArticleComments() {
-    //   this.axios
-    //     .get("http://helloWorld.test/api/testChart")
-    //     .then(response => {
-    //       this.xyz = response.data.data;
-    //     })
-    //     .catch();
-    // }
   }
 };
 </script>
