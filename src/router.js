@@ -5,7 +5,7 @@ import Dashboard from "@/components/Dashboard";
 import ArticlePage from "@/components/ArticlePage";
 import YourQuestions from "@/components/YourQuestions";
 import RandomChart from "@/components/RandomChart";
-import DragChart from "@/components/DragChart";
+import DragCharting from "@/components/DragCharting";
 
 // import CheckChart from "@/components/CheckChart";
 
@@ -31,8 +31,8 @@ export default new VueRouter({
       component: RandomChart
     },
     {
-      path: "/dragchart",
-      component: DragChart
+      path: "/dragcharting",
+      component: DragCharting
     }
     // {
     //   path: "/check-chart",

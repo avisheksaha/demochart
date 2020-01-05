@@ -1,7 +1,131 @@
 <template>
-  <div class="container-fluid full-height overflow-hidden">
-    <!-- {{gotStates}} -->
-    <div class="row row1">
+  <div
+    class="container-fluid mb-2 overflow-hidden"
+    style="padding-left: 0px !important; padding-right: 0px !important;"
+  >
+    <div class="row">
+      <div class="col-md-7">
+        <div style="height: 100vh;">
+          <l-map style="height: 100%; width: 100%" :zoom="zoom" :center="center">
+            <l-tile-layer :url="url" :attribution="attribution"></l-tile-layer>
+            <l-marker :lat-lng="markerLatLng"></l-marker>
+          </l-map>
+        </div>
+      </div>
+      <div class="col-md-5">
+        <div class="row">
+          <div class="col-md-6" style="padding-left:0px !important;">
+            <label class="my-1 mr-2 text-white" for="inlineFormCustomSelectPref">Select State</label>
+            <div v-if="gotStates.length > 0">
+              <select
+                class="custom-select my-1 mr-sm-2"
+                v-model="selectState"
+                @change="stateSelected(selectState.id)"
+                id="inlineFormCustomSelectPref"
+              >
+                <option selected>Choose...</option>
+                <option
+                  v-for="(gotState, index) in gotStates"
+                  :key="index"
+                  :value="gotState"
+                >{{ gotState.name }}</option>
+              </select>
+            </div>
+          </div>
+          <div
+            class="col-md-6"
+            v-if="selectState"
+            style="padding-left:0px !important; padding-right: 25px !important;"
+          >
+            <label class="my-1 mr-2" for="inlineFormCustomSelectPref">Select Districts</label>
+            <select
+              class="custom-select my-1 mr-sm-2"
+              v-model="selectDistrict"
+              @change="districtSelected(selectDistrict)"
+              id="inlineFormCustomSelectPref"
+            >
+              <option selected>Choose...</option>
+              <option
+                v-for="(district, index) in selectState.districts"
+                :key="index"
+                :value="district"
+              >{{ district }}</option>
+            </select>
+          </div>
+        </div>
+        <div class="row mt-2">
+          <div
+            class="col-md-5"
+            style="height:250px; padding-left: 0px !important; padding-right:0px !important;"
+          >
+            <div class="card bg-dark">
+              <div class="card-body text-white py-2 px-4">
+                <h6>Total factories</h6>
+                <h2 v-if="this.factoryCtg.total > 0" class="mt-4">{{ this.factoryCtg.total }}</h2>
+                <h2 class="mt-4" v-else>{{ this.factoryCtgState.total }}</h2>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-7" style="height:250px; padding-right:25px !important;">
+            <div class="card bg-dark">
+              <div class="card-body py-2">
+                <piefactorycatg-chart
+                  :chart-data="datacollectionFactoryCatgPie"
+                  :options="optionspie"
+                  :height="220"
+                  :width="100"
+                ></piefactorycatg-chart>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div
+            class="col-md-5"
+            style="padding-left: 0px !important; padding-right: 0px !important;"
+          >
+            <div class="card bg-dark">
+              <div
+                class="card-body text-white"
+                style="padding-top:10px !important; padding-bottom:5px !important;"
+              >
+                <h6>Total number of Small Growers</h6>
+                <h2 v-if="this.xyz.Grower_count > 0" class="mt-5">{{this.xyz.Grower_count}}</h2>
+                <h2 class="mt-5" v-else>{{this.xyzState.Grower_count}}</h2>
+                <!-- <h2 class="mt-4">{{ this.xyzState.Grower_count }}</h2> -->
+              </div>
+            </div>
+          </div>
+          <div class="col-md-7" style="padding-right: 25px !important;">
+            <div class="card bg-dark">
+              <div
+                class="card-body text-white"
+                style="padding-top:10px !important; padding-bottom:5px !important;"
+              >
+                <h6>Total area under plantation of STG</h6>
+                <!-- <h6>of STG in {{ this.xyz.district }}</h6> -->
+                <h2
+                  v-if="this.xyz.total_plantation > 0"
+                  class="mt-5"
+                >{{ this.xyz.total_plantation }} ha</h2>
+                <h2 class="mt-5" v-else>{{this.xyzState.total_plantation}}</h2>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="card bg-dark" style="margin-top: 4px;">
+            <barareavsgrower-chart
+              :chart-data="datacollectionBarAreaVsGrowerCode"
+              :options="optionsbarareavsgrower"
+              :height="250"
+            ></barareavsgrower-chart>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row px-3 pb-4">
       <div class="col-md-4">
         <label class="my-1 mr-2 text-white" for="inlineFormCustomSelectPref">Select State</label>
         <div v-if="gotStates.length > 0">
@@ -37,58 +161,48 @@
         </select>
       </div>
     </div>
-    <div class="row row2">
-      <div class="col-md-4 pr-0 full-height">
-        <div class="row ht20">
-          <div class="col-md-6 pr-0 full-height">
-            <div class="card bg-dark full-height">
+    <div class="row">
+      <div class="col-md-5" style="padding-right:0px !important;">
+        <div class="row">
+          <div class="col-md-6" style="padding-right:0px !important;">
+            <div class="card bg-dark">
               <div
                 class="card-body text-white"
-                style="padding-top:10px !important; padding-bottom:0px !important;"
+                style="padding-top:10px !important; padding-bottom:5px !important;"
               >
-                <h6 class="titleCard">Total number of Small Growers</h6>
-                <h2
-                  v-if="this.xyz.Grower_count > 0"
-                  class="cardValue mt-1"
-                >{{this.xyz.Grower_count}}</h2>
-                <h2 class="cardValue mt-1" v-else>{{this.xyzState.Grower_count}}</h2>
+                <h6>Total number of Small Growers</h6>
+                <h2 v-if="this.xyz.Grower_count > 0" class="mt-5">{{this.xyz.Grower_count}}</h2>
+                <h2 class="mt-5" v-else>{{this.xyzState.Grower_count}}</h2>
                 <!-- <h2 class="mt-4">{{ this.xyzState.Grower_count }}</h2> -->
               </div>
             </div>
           </div>
-          <div class="col-md-6 full-height" style="padding-left:5px !important;">
-            <div class="card bg-dark full-height">
+          <div class="col-md-6" style="padding-left:5px !important;">
+            <div class="card bg-dark">
               <div
                 class="card-body text-white"
-                style="padding-top:10px !important; padding-bottom:0px !important;"
+                style="padding-top:10px !important; padding-bottom:5px !important;"
               >
-                <h6 class="titleCard">Total area under plantation</h6>
+                <h6>Total area under plantation of STG</h6>
                 <!-- <h6>of STG in {{ this.xyz.district }}</h6> -->
                 <h2
-                  class="cardValue mt-1"
                   v-if="this.xyz.total_plantation > 0"
+                  class="mt-5"
                 >{{ this.xyz.total_plantation }} ha</h2>
-                <h2 class="cardValue mt-1" v-else>{{this.xyzState.total_plantation}}</h2>
+                <h2 class="mt-5" v-else>{{this.xyzState.total_plantation}}</h2>
               </div>
             </div>
           </div>
         </div>
-        <div class="row ht80">
-          <div class="col-md-12 full-height">
-            <div class="card bg-dark full-height">
-              <barareavsgrower-chart
-                :chart-data="datacollectionBarAreaVsGrowerCode"
-                :options="optionsbarareavsgrower"
-                :styles="myStyles"
-              ></barareavsgrower-chart>
-            </div>
-          </div>
+        <div class="card bg-dark" style="margin-top: 4px;">
+          <barareavsgrower-chart
+            :chart-data="datacollectionBarAreaVsGrowerCode"
+            :options="optionsbarareavsgrower"
+            :height="380"
+          ></barareavsgrower-chart>
         </div>
       </div>
-      <div
-        class="col-md-4 full-height"
-        style="padding-left: 5px !important; padding-right: 0px !important;"
-      >
+      <div class="col-md-7" style="padding-left: 5px !important;">
         <div style="height: 100%;">
           <l-map style="height: 100%; width: 100%" :zoom="zoom" :center="center">
             <l-tile-layer :url="url" :attribution="attribution"></l-tile-layer>
@@ -96,59 +210,52 @@
           </l-map>
         </div>
       </div>
-      <div class="col-md-4 full-height" style="padding-left: 5px;">
-        <div class="card px-4 bg-dark full-height">
-          <barqrcode-chart
-            :chart-data="datacollectionBarQrCode"
-            :options="optionsbar"
-            :styles="myStyles"
-          ></barqrcode-chart>
-        </div>
-      </div>
     </div>
-    <div class="row row3">
-      <div class="col-md-3 full-height" style="padding-right:0px !important;">
-        <div class="card bg-dark full-height px-4">
+    <div class="row" style="padding-top:5px;">
+      <div class="col-md-3" style="padding-right:0px !important;">
+        <div class="card bg-dark px-4" style="height:360px;">
           <doughnutmalefemale-chart
             :chart-data="datacollectionDoughnutMaleFemale"
             :options="options"
-            :style="myStyles"
+            :height="350"
           ></doughnutmalefemale-chart>
         </div>
       </div>
-      <div
-        class="col-md-3 full-height"
-        style="padding-right:0px !important; padding-left:5px !important;"
-      >
-        <div class="card px-4 bg-dark full-height">
+      <div class="col-md-3" style="padding-right:0px !important; padding-left:5px !important;">
+        <div class="card p-4 bg-dark" style="height:360px;">
+          <barqrcode-chart
+            :chart-data="datacollectionBarQrCode"
+            :options="optionsbar"
+            :height="306"
+          ></barqrcode-chart>
+        </div>
+      </div>
+      <div class="col-md-3" style="padding-right:0px !important; padding-left:5px !important;">
+        <div class="card bg-dark px-4 pb-2" style="height:360px;">
           <doughnutcaste-chart
             :chart-data="datacollectionDoughnutCaste"
             :options="optionssemidough"
-            :style="myStyles"
+            :height="350"
           ></doughnutcaste-chart>
         </div>
       </div>
-      <div class="col-md-3 full-height" style="padding-left:5px !important;">
-        <div class="card ht20 d-flex flex-row justify-content-center align-items-center">
-          <div>
-            <h6>Total factories:</h6>
+      <div class="col-md-3" style="padding-left:5px !important;">
+        <div class="card bg-dark" style="height:360px;">
+          <div
+            class="card-body text-white"
+            style="padding-top:10px !important; padding-bottom:5px !important;"
+          >
+            <h6>Total factories</h6>
+            <h2 v-if="this.factoryCtg.total > 0" class="mt-4">{{ this.factoryCtg.total }}</h2>
+            <h2 class="mt-4" v-else>{{ this.factoryCtgState.total }}</h2>
+            <div class="card bg-dark px-4 pb-2">
+              <piefactorycatg-chart
+                :chart-data="datacollectionFactoryCatgPie"
+                :options="optionspie"
+                :height="220"
+              ></piefactorycatg-chart>
+            </div>
           </div>
-          <div class="pl-2">
-            <h4 v-if="this.factoryCtg.total > 0">{{ this.factoryCtg.total }}</h4>
-            <h4 v-else>{{ this.factoryCtgState.total }}</h4>
-          </div>
-        </div>
-        <div class="card ht80">
-          <piefactorycatg-chart
-            :chart-data="datacollectionFactoryCatgPie"
-            :options="optionspie"
-            :style="myStyles"
-          ></piefactorycatg-chart>
-        </div>
-      </div>
-      <div class="col-md-3 full-height pl-0">
-        <div class="card full-height">
-          <div class="card-body"></div>
         </div>
       </div>
     </div>
@@ -176,7 +283,6 @@ const options = {
   responsive: true,
   maintainAspectRatio: false,
   cutoutPercentage: 65,
-  segmentShowStroke: false,
 
   animation: {
     animateRotate: true,
@@ -351,9 +457,6 @@ export default {
   },
   data() {
     return {
-      myStyles: {
-        height: "100%"
-      },
       zoomControl: false,
       attributionControl: false,
       url: "http://{s}.tile.osm.org/{z}/{x}/{y}.png",
@@ -440,7 +543,6 @@ export default {
               {
                 label: "Data One",
                 backgroundColor: ["#B83125", "#027585"],
-                borderWidth: 0,
                 data: [this.xyzState.Male_count, this.xyzState.Female_count]
               }
             ]
@@ -466,7 +568,7 @@ export default {
                   "#9FB328"
                 ],
                 pointBackgroundColor: "white",
-                borderWidth: 0,
+                borderWidth: 1,
                 pointBorderColor: "#249EBF",
                 data: [
                   this.xyzState.pending,
@@ -492,7 +594,7 @@ export default {
                   "#4A759E"
                 ],
                 pointBackgroundColor: "white",
-                borderWidth: 0,
+                borderWidth: 1,
                 pointBorderColor: "#249EBF",
                 data: [
                   this.xyzState.uptoTwo,
@@ -516,7 +618,6 @@ export default {
                   "#C0C0C0",
                   "#F96232"
                 ],
-                borderWidth: 0,
                 data: [
                   this.xyzState.ST,
                   this.xyzState.SC,
@@ -564,7 +665,6 @@ export default {
               {
                 label: "Data One",
                 backgroundColor: ["#CD5C5C", "#a9c722", "#c77722"],
-                borderWidth: 0,
                 data: [
                   this.factoryCtgState.BLF,
                   this.factoryCtgState.EF,
@@ -595,7 +695,6 @@ export default {
             datasets: [
               {
                 label: "Data One",
-                borderWidth: 0,
                 backgroundColor: ["#B83125", "#027585"],
                 data: [this.xyz.Male_count, this.xyz.Female_count]
               }
@@ -613,7 +712,6 @@ export default {
             datasets: [
               {
                 label: "QR code generation Progress",
-                borderWidth: 0,
                 backgroundColor: [
                   "#2E9CA6",
                   "#DC3F76",
@@ -623,6 +721,7 @@ export default {
                   "#9FB328"
                 ],
                 pointBackgroundColor: "white",
+                borderWidth: 1,
                 pointBorderColor: "#249EBF",
                 data: [
                   this.xyz.pending,
@@ -640,7 +739,6 @@ export default {
             datasets: [
               {
                 label: "Number of growers under certain area of Plantation",
-                borderWidth: 0,
                 backgroundColor: [
                   "#4A759E",
                   "#4A759E",
@@ -649,6 +747,7 @@ export default {
                   "#4A759E"
                 ],
                 pointBackgroundColor: "white",
+                borderWidth: 1,
                 pointBorderColor: "#249EBF",
                 data: [
                   this.xyz.uptoTwo,
@@ -665,7 +764,6 @@ export default {
             datasets: [
               {
                 label: "Data One",
-                borderWidth: 0,
                 backgroundColor: [
                   "#2E9CA6",
                   "#DC3F76",
@@ -721,7 +819,6 @@ export default {
             datasets: [
               {
                 label: "Data One",
-                borderWidth: 0,
                 backgroundColor: ["#CD5C5C", "#a9c722", "#c77722"],
                 data: [
                   this.factoryCtg.BLF,
@@ -774,43 +871,5 @@ export default {
 .small {
   max-width: 600px;
   margin: 150px auto;
-}
-.row1 {
-  height: 10%;
-}
-.row2 {
-  height: 55%;
-}
-.row3 {
-  height: 35%;
-}
-
-.full-height {
-  height: 100%;
-}
-.ht20 {
-  height: 20%;
-}
-.ht80 {
-  margin-top: 1%;
-  height: 79%;
-}
-@media only screen and (min-width: 801px) and (max-width: 1024px) {
-}
-@media only screen and (min-width: 1025px) and (max-width: 1366px) {
-  .titleCard {
-    font-size: 12px;
-  }
-  .cardValue {
-    font-size: 22px;
-  }
-}
-@media only screen and (min-width: 1367px) and (max-width: 1920px) {
-  .titleCard {
-    font-size: 14px;
-  }
-  .cardValue {
-    font-size: 26px;
-  }
 }
 </style>

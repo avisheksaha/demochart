@@ -37,12 +37,10 @@
         </div>
       </div>
     </nav>-->
-    <div>
-      <router-view></router-view>
-      <!-- <Dashboard></Dashboard> -->
-      <!-- <ArticlePage></ArticlePage> -->
-      <!-- <YourQuestions></YourQuestions> -->
-    </div>
+    <router-view></router-view>
+    <!-- <Dashboard></Dashboard> -->
+    <!-- <ArticlePage></ArticlePage> -->
+    <!-- <YourQuestions></YourQuestions> -->
   </div>
 </template>
 
@@ -72,5 +70,11 @@ export default {
   padding-right: 20px !important;
   font-size: 16px;
   color: black;
+}
+#app {
+  height: 100vh;
+}
+body {
+  height: 100vh;
 }
 </style>
