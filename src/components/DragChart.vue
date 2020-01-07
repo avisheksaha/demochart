@@ -1,29 +1,35 @@
 <template>
   <div
-    class="container-fluid overflow-hidden"
-    style="padding-left: 0px !important; padding-right: 0px !important;"
+    class="container-fluid overflow-hidden full-height"
+    style="padding-left: 0px !important; padding-right: 8px !important;"
   >
-    <div class="row">
-      <div class="col-md-7" style="height: 100vh;">
-        <l-map style="height: 100%; width: 100%;" :zoom="zoom" :center="center">
+    <div class="row full-height">
+      <div class="col-md-7 full-height pr-0">
+        <l-map style="height: 100%; width:100%" :zoom="zoom" :center="center">
           <l-tile-layer :url="url" :attribution="attribution"></l-tile-layer>
-          <l-marker
+          <l-marker v-for="marker in markers" :key="marker.id" :lat-lng="marker.position">
+            <l-tooltip>{{marker.id}}</l-tooltip>
+            <l-popup :content="marker.id"></l-popup>
+          </l-marker>
+          <l-polygon :lat-lngs="polygon.latlngs" :color="polygon.color"></l-polygon>
+
+          <!-- <l-marker
             v-for="marker in markers"
             :key="marker.id"
             :draggable="true"
             :lat-lng="marker.position"
             @dragend="updateCordinates"
-          ></l-marker>
-          <l-circle :lat-lng="center" :radius="circle.radius" :color="circle.color" />
+          ></l-marker>-->
+          <!-- <l-circle :lat-lng="center" :radius="circle.radius" :color="circle.color" /> -->
         </l-map>
       </div>
-      <div class="col-md-5">
-        <div class="row">
-          <div class="col-md-6">
-            <label class="my-1 mr-2 text-white" for="inlineFormCustomSelectPref">Select State</label>
+      <div class="col-md-5 full-height pl-2">
+        <div class="row row1">
+          <div class="col-md-6 full-height">
+            <label class="text-white" for="inlineFormCustomSelectPref">Select State</label>
             <div v-if="gotStates.length > 0">
               <select
-                class="custom-select my-1 mr-sm-2"
+                class="custom-select"
                 v-model="selectState"
                 @change="stateSelected(selectState.id)"
                 id="inlineFormCustomSelectPref"
@@ -37,11 +43,12 @@
               </select>
             </div>
           </div>
-          <div class="col-md-6" v-if="selectState">
-            <label class="my-1 mr-2 text-white" for="inlineFormCustomSelectPref">Select Districts</label>
+          <div class="col-md-6 full-height" v-if="selectState">
+            <label class="text-white" for="inlineFormCustomSelectPref">Select Districts</label>
             <select
-              class="custom-select my-1 mr-sm-2"
+              class="custom-select"
               v-model="selectDistrict"
+              @change="districtSelected(selectDistrict)"
               id="inlineFormCustomSelectPref"
             >
               <option selected>Choose...</option>
@@ -53,74 +60,176 @@
             </select>
           </div>
         </div>
+        <div class="row row2">
+          <div class="col-md-6 full-height pr-0">
+            <div class="card bg-dark text-white ht20">
+              <span
+                class="px-4 pt-2"
+                style="font-size: 20px;"
+                v-if="(selectState && !(selectDistrict))"
+              >Total Factories: {{factoryCtgState.total}}</span>
+              <span
+                class="px-4 pt-2"
+                style="font-size: 20px;"
+                v-else-if="(selectState && selectDistrict)"
+              >Total Factories: {{factoryCtg.total}}</span>
+            </div>
+            <div class="card bg-dark text-white pb-2 ht80">
+              <piefactorycatg-chart
+                :chart-data="datacollectionFactoryCatgPie"
+                :options="optionspie"
+                :style="myStyles"
+              ></piefactorycatg-chart>
+            </div>
+          </div>
+          <div class="col-md-6 full-height pl-1">
+            <div
+              class="card bg-dark ht50 text-white px-4 py-2 d-flex justify-content-center align-items-center"
+            >
+              <div>
+                <h5>Total Installed Capacity</h5>
+              </div>
+              <div>
+                <h1 class="mt-2" v-if="(selectState && !(selectDistrict))">
+                  {{factoryCtgState.Installed_Capacity}}
+                  <span style="font-size:24px;">kg</span>
+                </h1>
+                <h1
+                  class="mt-2"
+                  v-else-if="(selectDistrict && selectState)"
+                >{{factoryCtg.installed_capacity}} kg</h1>
+              </div>
+            </div>
+            <div
+              class="card ht49 bg-dark text-white d-flex justify-content-center align-items-center px-4 py-2"
+            >
+              <div>
+                <h5>Registered with Chai-Sahyog</h5>
+              </div>
+              <div>
+                <h1
+                  class="mt-2"
+                  v-if="(selectState && !(selectDistrict))"
+                >{{factoryCtgState.Registered_Factory}}</h1>
+                <h1
+                  class="mt-2"
+                  v-else-if="(selectState && selectDistrict)"
+                >{{factoryCtg.Registered_Factory}}</h1>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="row row3">
+          <div class="col-md-6 full-height pr-0">
+            <div class="card bg-dark full-height"></div>
+          </div>
+          <div class="col-md-6 full-height pl-1">
+            <div class="card bg-dark full-height"></div>
+          </div>
+        </div>
+        <!-- <div class="row row4">
+          <div class="col-md-12 full-height">
+            <div class="card full-height"></div>
+          </div>
+        </div>-->
       </div>
     </div>
   </div>
 </template>
 
 <script>
-import { LMap, LTileLayer, LMarker, LCircle } from "vue2-leaflet";
+import PiefactorycatgChart from "./charts/PiefactorycatgChart.js";
+
+import {
+  LMap,
+  LTileLayer,
+  LMarker,
+  LTooltip,
+  LPopup,
+  LPolygon
+} from "vue2-leaflet";
+const optionspie = {
+  responsive: true,
+  maintainAspectRatio: false,
+  pieceLabel: {
+    mode: "value",
+    precision: 1
+  },
+  animation: {
+    animateRotate: true,
+    animateScale: true
+  },
+  legend: {
+    // position: "right",
+    labels: {
+      // This more specific font property overrides the global property
+      fontColor: "white"
+    }
+  },
+  title: {
+    display: true,
+    fontColor: "white",
+    fontSize: 16,
+    fontFamily: "'Helvetica Neue',Helvetica, Arial, sans-serif",
+    text: "Factory Category"
+  }
+};
 export default {
   data() {
     return {
+      myStyles: {
+        height: "100%"
+      },
       zoomControl: false,
       attributionControl: false,
       url: "http://{s}.tile.osm.org/{z}/{x}/{y}.png",
       attribution:
         '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors',
-      zoom: 10,
+      zoom: 7,
       center: [28.6139, 77.209],
-      markers: [
-        {
-          id: "m1",
-          position: [28.6139, 77.209],
-          visible: true,
-          icon: this.myMarkerIcon
-        }
-      ],
-      // markerLatLng: [28.6139, 77.209],
-
-      circle: {
-        radius: 10000,
-        color: "red"
+      markers: [],
+      polygon: {
+        latlngs: [
+          [28.468691297348148, 93.515625],
+          [27.117812842321225, 91.28540039062501],
+          [26.020999877418795, 90.06591796875001],
+          [26.207198534534083, 90.78689575195314],
+          [24.956180020055925, 92.71911621093751],
+          [26.55904998407556, 94.46594238281251],
+          [27.702983735525862, 97.10815429687501],
+          [29.401319510041485, 96.20727539062503],
+          [28.468691297348148, 93.515625]
+        ],
+        color: "green"
       },
       coordinates: [],
+      // circle: {
+      //   radius: 10000,
+      //   color: "red"
+      // },
 
+      gotStates: [],
       selectState: null,
+      factoryCtgState: {},
+      factoryCtg: {},
+      locationsState: null,
+
+      datacollectionFactoryCatgPie: null,
+      optionspie,
+
       selectDistrict: null,
-      xyz: {
-        Grower_count: 0,
-        total_plantation: 0
-      },
-      xyzState: {
-        Grower_count: 0,
-        total_plantation: 0
-      },
-      factoryCount: 0,
-      factoryCountState: 0,
-      district_name: "",
-      state_name: "",
-      factoryCtg: {
-        total: 0,
-        blf: 0,
-        ef: 0,
-        it: 0
-      },
-      factoryCtgState: {
-        total: 0,
-        blf: 0,
-        ef: 0,
-        it: 0
-      },
-      districts: [],
-      gotStates: []
+
+      districts: []
     };
   },
   components: {
     LMap,
     LTileLayer,
     LMarker,
-    LCircle
+    LTooltip,
+    LPopup,
+    LPolygon,
+    PiefactorycatgChart
   },
   mounted() {
     this.receiveStates();
@@ -128,149 +237,40 @@ export default {
   methods: {
     receiveStates() {
       this.axios
-        .get("http://774dc56d.ngrok.io/api/v1/state-list")
+        .get("http://6ccdad79.ngrok.io/api/v1/state-list")
         .then(response => {
           this.gotStates = response.data.data;
         })
         .catch();
     },
     stateSelected(selectState) {
-      this.getMaleFemaleCountState(selectState);
-      this.getFactoryCountState(selectState);
       this.factoryCatgState(selectState);
-    },
-    getMaleFemaleCountState(selectState) {
-      this.axios
-        .get(`http://774dc56d.ngrok.io/api/v1/state/${selectState}`)
-        .then(response => {
-          this.xyzState = response.data.data;
-          this.state_name = response.data.state;
-          this.datacollectionDoughnutMaleFemale = {
-            labels: ["Male", "Female"],
-            datasets: [
-              {
-                label: "Data One",
-                backgroundColor: ["#B83125", "#027585"],
-                data: [this.xyzState.Male_count, this.xyzState.Female_count]
-              }
-            ]
-          };
-          this.datacollectionBarQrCode = {
-            labels: [
-              "Pending",
-              "Processing",
-              "On-Print",
-              "Downloaded",
-              "Dispatched",
-              "Printed"
-            ],
-            datasets: [
-              {
-                label: "QR code generation Progress",
-                backgroundColor: [
-                  "#2E9CA6",
-                  "#DC3F76",
-                  "#7446B9",
-                  "#C0C0C0",
-                  "#F96232",
-                  "#9FB328"
-                ],
-                pointBackgroundColor: "white",
-                borderWidth: 1,
-                pointBorderColor: "#249EBF",
-                data: [
-                  this.xyzState.pending,
-                  this.xyzState.processing,
-                  this.xyzState.onprint,
-                  this.xyzState.downloaded,
-                  this.xyzState.dispatched,
-                  this.xyzState.printed
-                ]
-              }
-            ]
-          };
-          this.datacollectionBarAreaVsGrowerCode = {
-            labels: ["0-2 ha", "2.1-4 ha", "4.1-6 ha", "6.1-8 ha", "8.1-10.2"],
-            datasets: [
-              {
-                label: "Number of growers under certain area of Plantation",
-                backgroundColor: [
-                  "#4A759E",
-                  "#4A759E",
-                  "#4A759E",
-                  "#4A759E",
-                  "#4A759E"
-                ],
-                pointBackgroundColor: "white",
-                borderWidth: 1,
-                pointBorderColor: "#249EBF",
-                data: [
-                  this.xyzState.uptoTwo,
-                  this.xyzState.uptoFour,
-                  this.xyzState.uptoSix,
-                  this.xyzState.uptoEight,
-                  this.xyzState.uptoTen
-                ]
-              }
-            ]
-          };
-          this.datacollectionDoughnutCaste = {
-            labels: ["ST", "SC", "OBC", "MOBC", "GEN"],
-            datasets: [
-              {
-                label: "Data One",
-                backgroundColor: [
-                  "#2E9CA6",
-                  "#DC3F76",
-                  "#7446B9",
-                  "#C0C0C0",
-                  "#F96232"
-                ],
-                data: [
-                  this.xyzState.ST,
-                  this.xyzState.SC,
-                  this.xyzState.OBC,
-                  this.xyzState.MOBC,
-                  this.xyzState.GEN
-                ]
-              }
-            ]
-          };
-          this.center = this.xyzState.location;
-          this.markerLatLng = this.xyzState.location;
-        })
-        .catch();
-    },
-    getFactoryCountState(selectState) {
-      this.axios
-        .get(`http://774dc56d.ngrok.io/api/v1/factory-count/${selectState}`)
-        .then(response => {
-          console.log("dsdsds");
-          this.factoryCountState = response.data.data;
-          // this.datacollectionDoughnutFactory = {
-          //   labels: ["Factory Count"],
-          //   datasets: [
-          //     {
-          //       label: "Data One",
-          //       backgroundColor: ["#B83125", "#027585"],
-          //       data: [this.factoryCount]
-          //     }
-          //   ]
-          // };
-        })
-        .catch();
     },
     factoryCatgState(selectState) {
       this.axios
         .get(
-          `http://774dc56d.ngrok.io/api/v1/state/factory-category/${selectState}`
+          `http://6ccdad79.ngrok.io/api/v1/state/factory-category/${selectState}`
         )
         .then(response => {
           this.factoryCtgState = response.data.data;
+          // this.markers = response.data.data.factoryloc;
+          this.center = response.data.data.location;
+          let floc = response.data.data.factoryloc;
+          console.log(floc);
+          floc.forEach(element => {
+            let flocVar = {
+              id: element.name,
+              position: element.position,
+              visible: true,
+              icon: this.myMarkerIcon
+            };
+            this.markers.push(flocVar);
+          });
           this.datacollectionFactoryCatgPie = {
             labels: ["BLF", "EF", "IT"],
             datasets: [
               {
+                borderWidth: 0,
                 label: "Data One",
                 backgroundColor: ["#CD5C5C", "#a9c722", "#c77722"],
                 data: [
@@ -285,6 +285,34 @@ export default {
         .catch();
     },
 
+    districtSelected(selectDistrict) {
+      this.factoryCatg(selectDistrict);
+    },
+    factoryCatg(selectDistrict) {
+      this.axios
+        .get(
+          `http://6ccdad79.ngrok.io/api/v1/district/factory-category/${selectDistrict}`
+        )
+        .then(response => {
+          this.factoryCtg = response.data.data;
+          this.datacollectionFactoryCatgPie = {
+            labels: ["BLF", "EF", "IT"],
+            datasets: [
+              {
+                label: "Data One",
+                borderWidth: 0,
+                backgroundColor: ["#CD5C5C", "#a9c722", "#c77722"],
+                data: [
+                  this.factoryCtg.BLF,
+                  this.factoryCtg.EF,
+                  this.factoryCtg.IT
+                ]
+              }
+            ]
+          };
+        })
+        .catch();
+    },
     updateCordinates(event) {
       // console.log("sdsdsd");
       var latlng = event.target.getLatLng();
@@ -299,5 +327,38 @@ export default {
 };
 </script>
 
-<style lang="scss" scoped>
+<style scoped>
+.row1 {
+  height: 10%;
+}
+.row2 {
+  margin-top: 4px;
+  margin-bottom: 0px;
+  height: 46%;
+}
+.row3 {
+  margin-top: 4px;
+  margin-bottom: 4px;
+  height: 39%;
+}
+/* .row4 {
+  height: 21%;
+} */
+.ht20 {
+  height: 20%;
+}
+.ht50 {
+  height: 50%;
+}
+.ht49 {
+  margin-top: 4px;
+  height: 49%;
+}
+.ht80 {
+  height: 79%;
+  margin-top: 4px;
+}
+.full-height {
+  height: 100%;
+}
 </style>

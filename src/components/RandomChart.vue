@@ -1,5 +1,8 @@
 <template>
-  <div class="container-fluid full-height overflow-hidden">
+  <div
+    class="container-fluid full-height overflow-hidden"
+    style="padding-left:8px !important; padding-right:8px !important;"
+  >
     <!-- {{gotStates}} -->
     <div class="row row1">
       <div class="col-md-4">
@@ -21,14 +24,14 @@
         </div>
       </div>
       <div class="col-md-4" v-if="selectState">
-        <label class="my-1 mr-2" for="inlineFormCustomSelectPref">Select Districts</label>
+        <label class="my-1 mr-2 text-white" for="inlineFormCustomSelectPref">Select Districts</label>
         <select
           class="custom-select my-1 mr-sm-2"
           v-model="selectDistrict"
           @change="districtSelected(selectDistrict)"
           id="inlineFormCustomSelectPref"
         >
-          <option selected>Choose...</option>
+          <!-- <option selected>Choose...</option> -->
           <option
             v-for="(district, index) in selectState.districts"
             :key="index"
@@ -128,17 +131,20 @@
           ></doughnutcaste-chart>
         </div>
       </div>
-      <div class="col-md-3 full-height" style="padding-left:5px !important;">
-        <div class="card ht20 d-flex flex-row justify-content-center align-items-center">
+      <div
+        class="col-md-3 full-height"
+        style="padding-left:5px !important; padding-right:0px !important;"
+      >
+        <div class="card bg-dark ht20 d-flex flex-row justify-content-center align-items-center">
           <div>
-            <h6>Total factories:</h6>
+            <h6 class="text-white">Total factories:</h6>
           </div>
-          <div class="pl-2">
+          <div class="pl-2 text-white">
             <h4 v-if="this.factoryCtg.total > 0">{{ this.factoryCtg.total }}</h4>
             <h4 v-else>{{ this.factoryCtgState.total }}</h4>
           </div>
         </div>
-        <div class="card ht80">
+        <div class="card bg-dark ht80">
           <piefactorycatg-chart
             :chart-data="datacollectionFactoryCatgPie"
             :options="optionspie"
@@ -146,10 +152,8 @@
           ></piefactorycatg-chart>
         </div>
       </div>
-      <div class="col-md-3 full-height pl-0">
-        <div class="card full-height">
-          <div class="card-body"></div>
-        </div>
+      <div class="col-md-3 full-height" style="padding-left:5px !important;">
+        <div class="card bg-dark full-height"></div>
       </div>
     </div>
   </div>
@@ -417,7 +421,7 @@ export default {
   methods: {
     receiveStates() {
       this.axios
-        .get("http://774dc56d.ngrok.io/api/v1/state-list")
+        .get("http://6ccdad79.ngrok.io/api/v1/state-list")
         .then(response => {
           this.gotStates = response.data.data;
         })
@@ -430,7 +434,7 @@ export default {
     },
     getMaleFemaleCountState(selectState) {
       this.axios
-        .get(`http://774dc56d.ngrok.io/api/v1/state/${selectState}`)
+        .get(`http://6ccdad79.ngrok.io/api/v1/state/${selectState}`)
         .then(response => {
           this.xyzState = response.data.data;
           this.state_name = response.data.state;
@@ -534,7 +538,7 @@ export default {
     },
     getFactoryCountState(selectState) {
       this.axios
-        .get(`http://774dc56d.ngrok.io/api/v1/factory-count/${selectState}`)
+        .get(`http://6ccdad79.ngrok.io/api/v1/factory-count/${selectState}`)
         .then(response => {
           console.log("dsdsds");
           this.factoryCountState = response.data.data;
@@ -554,7 +558,7 @@ export default {
     factoryCatgState(selectState) {
       this.axios
         .get(
-          `http://774dc56d.ngrok.io/api/v1/state/factory-category/${selectState}`
+          `http://6ccdad79.ngrok.io/api/v1/state/factory-category/${selectState}`
         )
         .then(response => {
           this.factoryCtgState = response.data.data;
@@ -586,7 +590,7 @@ export default {
       // `http://4077d282.ngrok.io/api/v1/district/${selectDistrict}`
       // "http://helloWorld.test/api/malefemale"
       this.axios
-        .get(`http://774dc56d.ngrok.io/api/v1/district/${selectDistrict}`)
+        .get(`http://6ccdad79.ngrok.io/api/v1/district/${selectDistrict}`)
         .then(response => {
           this.xyz = response.data.data;
           this.district_name = response.data.district;
@@ -692,7 +696,7 @@ export default {
       // `http://4077d282.ngrok.io/api/v1/factory-count/${selectDistrict}`
       // "http://helloWorld.test/api/factory"
       this.axios
-        .get(`http://774dc56d.ngrok.io/api/v1/factory-count/${selectDistrict}`)
+        .get(`http://6ccdad79.ngrok.io/api/v1/factory-count/${selectDistrict}`)
         .then(response => {
           console.log("dsdsds");
           this.factoryCount = response.data.data;
@@ -712,7 +716,7 @@ export default {
     factoryCatg(selectDistrict) {
       this.axios
         .get(
-          `http://774dc56d.ngrok.io/api/v1/district/factory-category/${selectDistrict}`
+          `http://6ccdad79.ngrok.io/api/v1/district/factory-category/${selectDistrict}`
         )
         .then(response => {
           this.factoryCtg = response.data.data;
@@ -779,10 +783,11 @@ export default {
   height: 10%;
 }
 .row2 {
-  height: 55%;
+  margin-bottom: 4px;
+  height: 54%;
 }
 .row3 {
-  height: 35%;
+  height: 34%;
 }
 
 .full-height {

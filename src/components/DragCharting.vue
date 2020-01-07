@@ -8,7 +8,14 @@
         <div style="height: 100vh;">
           <l-map style="height: 100%; width: 100%" :zoom="zoom" :center="center">
             <l-tile-layer :url="url" :attribution="attribution"></l-tile-layer>
-            <l-marker :lat-lng="markerLatLng"></l-marker>
+            <l-marker
+              v-for="marker in markers"
+              :key="marker.id"
+              :draggable="true"
+              :lat-lng="marker.position"
+              @click="abc"
+            ></l-marker>
+            <l-tooltip v-for="marker in markers" :key="marker.id">Hello</l-tooltip>
           </l-map>
         </div>
       </div>
@@ -263,7 +270,7 @@
 </template>
 
 <script>
-import { LMap, LTileLayer, LMarker } from "vue2-leaflet";
+import { LMap, LTileLayer, LMarker, LTooltip } from "vue2-leaflet";
 
 // Vue.component("l-map", Vue2Leaflet.LMap);
 // Vue.component("l-tile-layer", Vue2Leaflet.LTileLayer);
@@ -445,6 +452,7 @@ export default {
     LMap,
     LTileLayer,
     LMarker,
+    LTooltip,
     // LineChart,
     // BarChart,
     // PieChart,
@@ -457,6 +465,26 @@ export default {
   },
   data() {
     return {
+      markers: [
+        {
+          id: "m1",
+          position: [28.6139, 77.209],
+          visible: true,
+          icon: this.myMarkerIcon
+        },
+        {
+          id: "m2",
+          position: [28.655, 77.1888],
+          visible: true,
+          icon: this.myMarkerIcon
+        },
+        {
+          id: "m3",
+          position: [28.6304, 77.2177],
+          visible: true,
+          icon: this.myMarkerIcon
+        }
+      ],
       zoomControl: false,
       attributionControl: false,
       url: "http://{s}.tile.osm.org/{z}/{x}/{y}.png",
