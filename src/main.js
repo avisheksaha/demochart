@@ -1,6 +1,10 @@
 import Vue from "vue";
+
 import App from "./App.vue";
-import "bootstrap/dist/css/bootstrap.min.css";
+// import BootstrapVue from "bootstrap-vue";
+
+import "bootstrap/dist/css/bootstrap.css";
+// import "bootstrap-vue/dist/bootstrap-vue.css";
 
 import axios from "axios";
 import VueAxios from "vue-axios";
@@ -11,6 +15,7 @@ import router from "./router";
 
 Vue.use(CKEditor);
 Vue.use(VueAxios, axios);
+// Vue.use(BootstrapVue);
 // Vue.prototype.axios = window.axios;
 // axios.defaults.baseURL = "http://helloworld.test/api";
 Vue.config.productionTip = false;

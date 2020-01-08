@@ -7,6 +7,7 @@ import YourQuestions from "@/components/YourQuestions";
 import RandomChart from "@/components/RandomChart";
 import DragCharting from "@/components/DragCharting";
 import DragChart from "@/components/DragChart";
+import FullMap from "@/components/FullMap";
 
 // import CheckChart from "@/components/CheckChart";
 
@@ -38,6 +39,10 @@ export default new VueRouter({
     {
       path: "/dragchart",
       component: DragChart
+    },
+    {
+      path: "/fullmap",
+      component: FullMap
     }
     // {
     //   path: "/check-chart",

@@ -7,9 +7,9 @@
       <div class="col-md-7 full-height pr-0">
         <l-map style="height: 100%; width:100%" :zoom="zoom" :center="center">
           <l-tile-layer :url="url" :attribution="attribution"></l-tile-layer>
-          <l-marker v-for="marker in markers" :key="marker.id" :lat-lng="marker.position">
-            <l-tooltip>{{marker.id}}</l-tooltip>
-            <l-popup :content="marker.id"></l-popup>
+          <l-marker v-for="marker in markers" :key="marker.factory_id" :lat-lng="marker.position">
+            <l-tooltip>{{marker.factory_id}}</l-tooltip>
+            <l-popup :content="marker.factory_name"></l-popup>
           </l-marker>
           <l-polygon :lat-lngs="polygon.latlngs" :color="polygon.color"></l-polygon>
 
@@ -144,9 +144,9 @@ import {
   LMap,
   LTileLayer,
   LMarker,
+  LPolygon,
   LTooltip,
-  LPopup,
-  LPolygon
+  LPopup
 } from "vue2-leaflet";
 const optionspie = {
   responsive: true,
@@ -185,7 +185,7 @@ export default {
       url: "http://{s}.tile.osm.org/{z}/{x}/{y}.png",
       attribution:
         '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors',
-      zoom: 7,
+      zoom: 8,
       center: [28.6139, 77.209],
       markers: [],
       polygon: {
@@ -203,6 +203,7 @@ export default {
         color: "green"
       },
       coordinates: [],
+
       // circle: {
       //   radius: 10000,
       //   color: "red"
@@ -226,10 +227,10 @@ export default {
     LMap,
     LTileLayer,
     LMarker,
-    LTooltip,
-    LPopup,
     LPolygon,
-    PiefactorycatgChart
+    PiefactorycatgChart,
+    LTooltip,
+    LPopup
   },
   mounted() {
     this.receiveStates();
@@ -245,6 +246,7 @@ export default {
     },
     stateSelected(selectState) {
       this.factoryCatgState(selectState);
+      this.factoryLocnState(selectState);
     },
     factoryCatgState(selectState) {
       this.axios
@@ -253,19 +255,7 @@ export default {
         )
         .then(response => {
           this.factoryCtgState = response.data.data;
-          // this.markers = response.data.data.factoryloc;
-          this.center = response.data.data.location;
-          let floc = response.data.data.factoryloc;
-          console.log(floc);
-          floc.forEach(element => {
-            let flocVar = {
-              id: element.name,
-              position: element.position,
-              visible: true,
-              icon: this.myMarkerIcon
-            };
-            this.markers.push(flocVar);
-          });
+
           this.datacollectionFactoryCatgPie = {
             labels: ["BLF", "EF", "IT"],
             datasets: [
@@ -284,7 +274,30 @@ export default {
         })
         .catch();
     },
-
+    factoryLocnState(selectState) {
+      this.axios
+        .get(
+          `http://6ccdad79.ngrok.io/api/v1/state/factory/location/${selectState}`
+        )
+        .then(response => {
+          // this.markers = response.data.data.factoryloc;
+          this.center = response.data.data.location;
+          let floc = response.data.data.factory_location;
+          console.log(floc);
+          floc.forEach(element => {
+            let flocVar = {
+              factory_id: element.factory_id,
+              factory_name: element.factory_name,
+              factory_rc_number: element.factory_rc_number,
+              position: element.position,
+              visible: true,
+              icon: this.myMarkerIcon
+            };
+            this.markers.push(flocVar);
+          });
+        })
+        .catch();
+    },
     districtSelected(selectDistrict) {
       this.factoryCatg(selectDistrict);
     },
@@ -312,17 +325,17 @@ export default {
           };
         })
         .catch();
-    },
-    updateCordinates(event) {
-      // console.log("sdsdsd");
-      var latlng = event.target.getLatLng();
-      console.log(latlng);
-      this.center = [latlng.lat, latlng.lng];
-      console.log(this.coordinates);
-
-      // console.log(latlng.lat, latlng.lng);
-      // (this.coordinates.lat = latlng.lat), (this.coordinates.lng = latlng.lng);
     }
+    // updateCordinates(event) {
+    //   // console.log("sdsdsd");
+    //   var latlng = event.target.getLatLng();
+    //   console.log(latlng);
+    //   this.center = [latlng.lat, latlng.lng];
+    //   console.log(this.coordinates);
+
+    //   // console.log(latlng.lat, latlng.lng);
+    //   // (this.coordinates.lat = latlng.lat), (this.coordinates.lng = latlng.lng);
+    // }
   }
 };
 </script>
