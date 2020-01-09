@@ -5,9 +5,14 @@
   >
     <div class="row full-height">
       <div class="col-md-12 full-height">
-        <l-map style="height: 100%; width:100%" :zoom="zoom" :center="center">
-          <l-control-polyline-measure :options="options" position="topright" />
-          <l-control-layers position="topright"></l-control-layers>
+        <l-map
+          style="height: 100%; width:100%"
+          :zoom="zoom"
+          :center="center"
+          @polylinemeasure:finish="abc"
+        >
+          <l-control-polyline-measure :options="options" position="topleft" />
+          <l-control-layers position="topleft"></l-control-layers>
           <l-tile-layer
             v-for="tileProvider in tileProviders"
             :key="tileProvider.name"
@@ -27,8 +32,23 @@
             <l-tooltip>{{ marker.id }}</l-tooltip>
             <l-popup>{{ marker.id }}</l-popup>
           </l-marker>
+          <l-circle-marker
+            :lat-lng="circle.center"
+            :radius="circle.radius"
+            :color="circle.color"
+            :fillColor="circle.fillColor"
+            :fillOpacity="circle.fillOpacity"
+          />
           <!-- other map components -->
         </l-map>
+        <b-modal v-model="modalShow">Hello From Modal!</b-modal>
+        <b-modal v-model="modalShowPolylineFinish">
+          <h5>Distance Covered:</h5>
+          <h1>
+            {{this.dist}}
+            <span style="font-size: 27px;">km</span>
+          </h1>
+        </b-modal>
       </div>
     </div>
   </div>
@@ -39,12 +59,17 @@ import {
   LMap,
   LTileLayer,
   LMarker,
+  LCircleMarker,
   LPopup,
   LTooltip,
   LControlLayers
 } from "vue2-leaflet";
 import LControlPolylineMeasure from "vue2-leaflet-polyline-measure";
 const options = {
+  unit: "kilometres",
+  showBearings: false,
+  clearMeasurementsOnStop: false,
+  showClearControl: true,
   showUnitControl: false,
   popupOptions: {
     className: "leaflet-measure-resultpopup",
@@ -55,6 +80,9 @@ export default {
   data() {
     return {
       modalShow: false,
+      modalShowPolylineFinish: false,
+      dist: null,
+
       options,
       zoomControl: false,
       attributionControl: false,
@@ -76,6 +104,13 @@ export default {
       ],
       zoom: 12,
       center: [28.6139, 77.209],
+      circle: {
+        center: [28.6136, 77.207],
+        radius: 5,
+        color: "#26291a",
+        fillColor: "#26291a",
+        fillOpacity: 1
+      },
 
       markers: [
         {
@@ -92,6 +127,7 @@ export default {
   components: {
     LMap,
     LMarker,
+    LCircleMarker,
     LControlLayers,
     LTileLayer,
     LPopup,
@@ -102,9 +138,18 @@ export default {
     showme() {
       console.log("sdsdsd");
     },
+    abc(currentLine) {
+      console.log(currentLine.distance);
+      let distVar = currentLine.distance;
+      this.dist = (distVar / 1000).toFixed(2);
+      this.modalShowPolylineFinish = true;
+    },
     alert(item) {
       alert("this is " + JSON.stringify(item));
     }
+  },
+  mounted() {
+    this.abc;
   }
 };
 </script>

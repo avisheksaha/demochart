@@ -7,7 +7,12 @@
       <div class="col-md-7 full-height pr-0">
         <l-map style="height: 100%; width:100%" :zoom="zoom" :center="center">
           <l-tile-layer :url="url" :attribution="attribution"></l-tile-layer>
-          <l-marker v-for="marker in markers" :key="marker.factory_id" :lat-lng="marker.position">
+          <l-marker
+            v-for="marker in markers"
+            :key="marker.factory_id"
+            :lat-lng="marker.position"
+            @click="openFactoryModal(marker)"
+          >
             <l-tooltip>{{marker.factory_id}}</l-tooltip>
             <l-popup :content="marker.factory_name"></l-popup>
           </l-marker>
@@ -22,6 +27,38 @@
           ></l-marker>-->
           <!-- <l-circle :lat-lng="center" :radius="circle.radius" :color="circle.color" /> -->
         </l-map>
+        <div v-if="factoryDetailsInModal">
+          <b-modal v-model="modalFactory">
+            <div>
+              <h6>
+                Factory Id:
+                <span
+                  style="font-size:20px; padding-left:3px;"
+                >{{factoryDetailsInModal.factory_id}}</span>
+              </h6>
+              <h6>
+                Factory RC_No:
+                <span
+                  style="font-size:20px; padding-left:3px;"
+                >{{factoryDetailsInModal.factory_rc_number}}</span>
+              </h6>
+              <h6>
+                Factory Name:
+                <span
+                  style="font-size:20px; padding-left:3px;"
+                >{{factoryDetailsInModal.factory_name}}</span>
+              </h6>
+              <h6>
+                State:
+                <span style="font-size:20px; padding-left:3px;">{{selectState.name}}</span>
+              </h6>
+              <h6>
+                District:
+                <span style="font-size:20px; padding-left:3px;">{{selectDistrict}}</span>
+              </h6>
+            </div>
+          </b-modal>
+        </div>
       </div>
       <div class="col-md-5 full-height pl-2">
         <div class="row row1">
@@ -34,7 +71,7 @@
                 @change="stateSelected(selectState.id)"
                 id="inlineFormCustomSelectPref"
               >
-                <option selected>Choose...</option>
+                <!-- <option selected>Choose...</option> -->
                 <option
                   v-for="(gotState, index) in gotStates"
                   :key="index"
@@ -49,9 +86,9 @@
               class="custom-select"
               v-model="selectDistrict"
               @change="districtSelected(selectDistrict)"
-              id="inlineFormCustomSelectPref"
+              id="inlineFormCustomSelectPref1"
             >
-              <option selected>Choose...</option>
+              <!-- <option selected>Choose...</option> -->
               <option
                 v-for="(district, index) in selectState.districts"
                 :key="index"
@@ -152,9 +189,10 @@ const optionspie = {
   responsive: true,
   maintainAspectRatio: false,
   pieceLabel: {
-    mode: "value",
+    render: "value",
     precision: 1
   },
+  showAllTooltips: true,
   animation: {
     animateRotate: true,
     animateScale: true
@@ -177,6 +215,9 @@ const optionspie = {
 export default {
   data() {
     return {
+      modalFactory: false,
+      tt: [],
+      factoryDetailsInModal: null,
       myStyles: {
         height: "100%"
       },
@@ -238,7 +279,7 @@ export default {
   methods: {
     receiveStates() {
       this.axios
-        .get("http://6ccdad79.ngrok.io/api/v1/state-list")
+        .get("http://bad1a99b.ngrok.io/api/v1/state-list")
         .then(response => {
           this.gotStates = response.data.data;
         })
@@ -251,7 +292,7 @@ export default {
     factoryCatgState(selectState) {
       this.axios
         .get(
-          `http://6ccdad79.ngrok.io/api/v1/state/factory-category/${selectState}`
+          `http://bad1a99b.ngrok.io/api/v1/state/factory-category/${selectState}`
         )
         .then(response => {
           this.factoryCtgState = response.data.data;
@@ -277,13 +318,14 @@ export default {
     factoryLocnState(selectState) {
       this.axios
         .get(
-          `http://6ccdad79.ngrok.io/api/v1/state/factory/location/${selectState}`
+          `http://bad1a99b.ngrok.io/api/v1/state/factory/location/${selectState}`
         )
         .then(response => {
           // this.markers = response.data.data.factoryloc;
           this.center = response.data.data.location;
           let floc = response.data.data.factory_location;
           console.log(floc);
+          this.markers.splice(0);
           floc.forEach(element => {
             let flocVar = {
               factory_id: element.factory_id,
@@ -300,11 +342,12 @@ export default {
     },
     districtSelected(selectDistrict) {
       this.factoryCatg(selectDistrict);
+      this.factoryLocn(selectDistrict);
     },
     factoryCatg(selectDistrict) {
       this.axios
         .get(
-          `http://6ccdad79.ngrok.io/api/v1/district/factory-category/${selectDistrict}`
+          `http://bad1a99b.ngrok.io/api/v1/district/factory-category/${selectDistrict}`
         )
         .then(response => {
           this.factoryCtg = response.data.data;
@@ -325,6 +368,37 @@ export default {
           };
         })
         .catch();
+    },
+    factoryLocn(selectDistrict) {
+      this.axios
+        .get(
+          `http://bad1a99b.ngrok.io/api/v1/district/factory/location/${selectDistrict}`
+        )
+        .then(response => {
+          // this.markers = response.data.data.factoryloc;
+          this.center = response.data.data.location;
+          let floc = response.data.data.factory_location;
+          console.log(floc);
+          this.markers.splice(0);
+          floc.forEach(element => {
+            let flocVar = {
+              factory_id: element.factory_id,
+              factory_name: element.factory_name,
+              factory_rc_number: element.factory_rc_number,
+              position: element.position,
+              visible: true,
+              icon: this.myMarkerIcon
+            };
+            this.markers.push(flocVar);
+          });
+        })
+        .catch();
+    },
+
+    openFactoryModal(marker) {
+      this.modalFactory = true;
+      this.factoryDetailsInModal = marker;
+      console.log(this.factoryDetailsInModal.factory_name);
     }
     // updateCordinates(event) {
     //   // console.log("sdsdsd");
