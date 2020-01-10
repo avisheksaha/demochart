@@ -196,7 +196,6 @@ export default {
   data() {
     return {
       modalFactory: false,
-      tt: [],
       factoryDetailsInModal: null,
       myStyles: {
         height: "100%"
@@ -394,6 +393,7 @@ export default {
     },
 
     openFactoryModal(marker) {
+      console.log(marker);
       this.modalFactory = true;
       this.factoryDetailsInModal = marker;
       console.log(this.selectState.name);

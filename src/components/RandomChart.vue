@@ -14,7 +14,7 @@
             @change="stateSelected(selectState.id)"
             id="inlineFormCustomSelectPref"
           >
-            <option selected>Choose...</option>
+            <option value="null" disabled>Select a State</option>
             <option
               v-for="(gotState, index) in gotStates"
               :key="index"
@@ -31,7 +31,7 @@
           @change="districtSelected(selectDistrict)"
           id="inlineFormCustomSelectPref"
         >
-          <!-- <option selected>Choose...</option> -->
+          <option value="null">Select a district</option>
           <option
             v-for="(district, index) in selectState.districts"
             :key="index"
@@ -50,12 +50,7 @@
                 style="padding-top:10px !important; padding-bottom:0px !important;"
               >
                 <h6 class="titleCard">Total number of Small Growers</h6>
-                <h2
-                  v-if="this.xyz.Grower_count > 0"
-                  class="cardValue mt-1"
-                >{{this.xyz.Grower_count}}</h2>
-                <h2 class="cardValue mt-1" v-else>{{this.xyzState.Grower_count}}</h2>
-                <!-- <h2 class="mt-4">{{ this.xyzState.Grower_count }}</h2> -->
+                <h2 class="cardValue mt-1">{{this.growersDataState.Grower_count}}</h2>
               </div>
             </div>
           </div>
@@ -66,12 +61,7 @@
                 style="padding-top:10px !important; padding-bottom:0px !important;"
               >
                 <h6 class="titleCard">Total area under plantation</h6>
-                <!-- <h6>of STG in {{ this.xyz.district }}</h6> -->
-                <h2
-                  class="cardValue mt-1"
-                  v-if="this.xyz.total_plantation > 0"
-                >{{ this.xyz.total_plantation }} ha</h2>
-                <h2 class="cardValue mt-1" v-else>{{this.xyzState.total_plantation}}</h2>
+                <h2 class="cardValue mt-1">{{this.growersDataState.total_plantation}}</h2>
               </div>
             </div>
           </div>
@@ -140,8 +130,7 @@
             <h6 class="text-white">Total factories:</h6>
           </div>
           <div class="pl-2 text-white">
-            <h4 v-if="this.factoryCtg.total > 0">{{ this.factoryCtg.total }}</h4>
-            <h4 v-else>{{ this.factoryCtgState.total }}</h4>
+            <h4>{{ this.factoryCtgState.total }}</h4>
           </div>
         </div>
         <div class="card bg-dark ht80">
@@ -367,8 +356,10 @@ export default {
       center: [28.6139, 77.209],
       markerLatLng: [28.6139, 77.209],
 
+      gotStates: [],
       selectState: null,
       selectDistrict: null,
+
       districts: [],
       options,
       optionsbar,
@@ -383,60 +374,45 @@ export default {
       datacollectionDoughnutCaste: null,
       datacollectionBarAreaVsGrowerCode: null,
       datacollectionFactoryCatgPie: null,
-      gotStates: [],
-      xyz: {
-        Grower_count: 0,
-        total_plantation: 0
-      },
-      xyzState: {
-        Grower_count: 0,
-        total_plantation: 0
-      },
-      factoryCount: 0,
-      factoryCountState: 0,
+
+      growersDataState: {},
+
       district_name: "",
       state_name: "",
-      factoryCtg: {
-        total: 0,
-        blf: 0,
-        ef: 0,
-        it: 0
-      },
-      factoryCtgState: {
-        total: 0,
-        blf: 0,
-        ef: 0,
-        it: 0
-      }
+      factoryCtgState: {}
     };
   },
+  watch: {
+    selectState(newValue, oldValue) {
+      if (newValue != oldValue) {
+        this.selectDistrict = null;
+      }
+    }
+  },
   mounted() {
-    // this.fillDataLine();
-    // this.fillDataBar();
-    // this.fillDataPie();
     this.receiveStates();
 
-    // this.fillDataDoughnut();
+    // this.fillDataLine();
   },
   methods: {
     receiveStates() {
       this.axios
-        .get("http://6ccdad79.ngrok.io/api/v1/state-list")
+        .get("http://f87fb9d3.ngrok.io/api/v1/state-list")
         .then(response => {
           this.gotStates = response.data.data;
         })
         .catch();
     },
-    stateSelected(selectState) {
-      this.getMaleFemaleCountState(selectState);
-      this.getFactoryCountState(selectState);
-      this.factoryCatgState(selectState);
+
+    stateSelected(selectedStateId) {
+      this.getGrowersDataState(selectedStateId);
+      this.factoryCatgState(selectedStateId);
     },
-    getMaleFemaleCountState(selectState) {
+    getGrowersDataState(selectedStateId) {
       this.axios
-        .get(`http://6ccdad79.ngrok.io/api/v1/state/${selectState}`)
+        .get(`http://f87fb9d3.ngrok.io/api/v1/state/${selectedStateId}`)
         .then(response => {
-          this.xyzState = response.data.data;
+          this.growersDataState = response.data.data;
           this.state_name = response.data.state;
           this.datacollectionDoughnutMaleFemale = {
             labels: ["Male", "Female"],
@@ -445,7 +421,10 @@ export default {
                 label: "Data One",
                 backgroundColor: ["#B83125", "#027585"],
                 borderWidth: 0,
-                data: [this.xyzState.Male_count, this.xyzState.Female_count]
+                data: [
+                  this.growersDataState.Male_count,
+                  this.growersDataState.Female_count
+                ]
               }
             ]
           };
@@ -473,12 +452,12 @@ export default {
                 borderWidth: 0,
                 pointBorderColor: "#249EBF",
                 data: [
-                  this.xyzState.pending,
-                  this.xyzState.processing,
-                  this.xyzState.onprint,
-                  this.xyzState.downloaded,
-                  this.xyzState.dispatched,
-                  this.xyzState.printed
+                  this.growersDataState.pending,
+                  this.growersDataState.processing,
+                  this.growersDataState.onprint,
+                  this.growersDataState.downloaded,
+                  this.growersDataState.dispatched,
+                  this.growersDataState.printed
                 ]
               }
             ]
@@ -499,11 +478,11 @@ export default {
                 borderWidth: 0,
                 pointBorderColor: "#249EBF",
                 data: [
-                  this.xyzState.uptoTwo,
-                  this.xyzState.uptoFour,
-                  this.xyzState.uptoSix,
-                  this.xyzState.uptoEight,
-                  this.xyzState.uptoTen
+                  this.growersDataState.uptoTwo,
+                  this.growersDataState.uptoFour,
+                  this.growersDataState.uptoSix,
+                  this.growersDataState.uptoEight,
+                  this.growersDataState.uptoTen
                 ]
               }
             ]
@@ -522,43 +501,25 @@ export default {
                 ],
                 borderWidth: 0,
                 data: [
-                  this.xyzState.ST,
-                  this.xyzState.SC,
-                  this.xyzState.OBC,
-                  this.xyzState.MOBC,
-                  this.xyzState.GEN
+                  this.growersDataState.ST,
+                  this.growersDataState.SC,
+                  this.growersDataState.OBC,
+                  this.growersDataState.MOBC,
+                  this.growersDataState.GEN
                 ]
               }
             ]
           };
-          this.center = this.xyzState.location;
-          this.markerLatLng = this.xyzState.location;
+          this.center = this.growersDataState.location;
+          this.markerLatLng = this.growersDataState.location;
         })
         .catch();
     },
-    getFactoryCountState(selectState) {
-      this.axios
-        .get(`http://6ccdad79.ngrok.io/api/v1/factory-count/${selectState}`)
-        .then(response => {
-          console.log("dsdsds");
-          this.factoryCountState = response.data.data;
-          // this.datacollectionDoughnutFactory = {
-          //   labels: ["Factory Count"],
-          //   datasets: [
-          //     {
-          //       label: "Data One",
-          //       backgroundColor: ["#B83125", "#027585"],
-          //       data: [this.factoryCount]
-          //     }
-          //   ]
-          // };
-        })
-        .catch();
-    },
-    factoryCatgState(selectState) {
+
+    factoryCatgState(selectedStateId) {
       this.axios
         .get(
-          `http://6ccdad79.ngrok.io/api/v1/state/factory-category/${selectState}`
+          `http://f87fb9d3.ngrok.io/api/v1/state/factory-category/${selectedStateId}`
         )
         .then(response => {
           this.factoryCtgState = response.data.data;
@@ -581,18 +542,20 @@ export default {
         .catch();
     },
 
-    districtSelected(selectDistrict) {
-      this.getMaleFemaleCount(selectDistrict);
-      this.getFactoryCount(selectDistrict);
-      this.factoryCatg(selectDistrict);
+    districtSelected(selectedDistrictName) {
+      if (this.selectDistrict == null) {
+        return;
+      }
+      this.getGrowersDataDistrict(selectedDistrictName);
+      this.factoryCatgDistrict(selectedDistrictName);
     },
-    getMaleFemaleCount(selectDistrict) {
-      // `http://4077d282.ngrok.io/api/v1/district/${selectDistrict}`
-      // "http://helloWorld.test/api/malefemale"
+    getGrowersDataDistrict(selectedDistrictName) {
+      this.growersDataState = {};
+
       this.axios
-        .get(`http://6ccdad79.ngrok.io/api/v1/district/${selectDistrict}`)
+        .get(`http://f87fb9d3.ngrok.io/api/v1/district/${selectedDistrictName}`)
         .then(response => {
-          this.xyz = response.data.data;
+          this.growersDataState = response.data.data;
           this.district_name = response.data.district;
           this.datacollectionDoughnutMaleFemale = {
             labels: ["Male", "Female"],
@@ -601,7 +564,10 @@ export default {
                 label: "Data One",
                 borderWidth: 0,
                 backgroundColor: ["#B83125", "#027585"],
-                data: [this.xyz.Male_count, this.xyz.Female_count]
+                data: [
+                  this.growersDataState.Male_count,
+                  this.growersDataState.Female_count
+                ]
               }
             ]
           };
@@ -629,12 +595,12 @@ export default {
                 pointBackgroundColor: "white",
                 pointBorderColor: "#249EBF",
                 data: [
-                  this.xyz.pending,
-                  this.xyz.processing,
-                  this.xyz.onprint,
-                  this.xyz.downloaded,
-                  this.xyz.dispatched,
-                  this.xyz.printed
+                  this.growersDataState.pending,
+                  this.growersDataState.processing,
+                  this.growersDataState.onprint,
+                  this.growersDataState.downloaded,
+                  this.growersDataState.dispatched,
+                  this.growersDataState.printed
                 ]
               }
             ]
@@ -655,11 +621,11 @@ export default {
                 pointBackgroundColor: "white",
                 pointBorderColor: "#249EBF",
                 data: [
-                  this.xyz.uptoTwo,
-                  this.xyz.uptoFour,
-                  this.xyz.uptoSix,
-                  this.xyz.uptoEight,
-                  this.xyz.uptoTen
+                  this.growersDataState.uptoTwo,
+                  this.growersDataState.uptoFour,
+                  this.growersDataState.uptoSix,
+                  this.growersDataState.uptoEight,
+                  this.growersDataState.uptoTen
                 ]
               }
             ]
@@ -678,48 +644,28 @@ export default {
                   "#F96232"
                 ],
                 data: [
-                  this.xyz.ST,
-                  this.xyz.SC,
-                  this.xyz.OBC,
-                  this.xyz.MOBC,
-                  this.xyz.GEN
+                  this.growersDataState.ST,
+                  this.growersDataState.SC,
+                  this.growersDataState.OBC,
+                  this.growersDataState.MOBC,
+                  this.growersDataState.GEN
                 ]
               }
             ]
           };
-          this.center = this.xyz.location;
-          this.markerLatLng = this.xyz.location;
+          this.center = this.growersDataState.location;
+          this.markerLatLng = this.growersDataState.location;
         })
         .catch();
     },
-    getFactoryCount(selectDistrict) {
-      // `http://4077d282.ngrok.io/api/v1/factory-count/${selectDistrict}`
-      // "http://helloWorld.test/api/factory"
-      this.axios
-        .get(`http://6ccdad79.ngrok.io/api/v1/factory-count/${selectDistrict}`)
-        .then(response => {
-          console.log("dsdsds");
-          this.factoryCount = response.data.data;
-          // this.datacollectionDoughnutFactory = {
-          //   labels: ["Factory Count"],
-          //   datasets: [
-          //     {
-          //       label: "Data One",
-          //       backgroundColor: ["#B83125", "#027585"],
-          //       data: [this.factoryCount]
-          //     }
-          //   ]
-          // };
-        })
-        .catch();
-    },
-    factoryCatg(selectDistrict) {
+    factoryCatgDistrict(selectedDistrictName) {
+      this.factoryCtgState = {};
       this.axios
         .get(
-          `http://6ccdad79.ngrok.io/api/v1/district/factory-category/${selectDistrict}`
+          `http://f87fb9d3.ngrok.io/api/v1/district/factory-category/${selectedDistrictName}`
         )
         .then(response => {
-          this.factoryCtg = response.data.data;
+          this.factoryCtgState = response.data.data;
           this.datacollectionFactoryCatgPie = {
             labels: ["BLF", "EF", "IT"],
             datasets: [
@@ -728,9 +674,9 @@ export default {
                 borderWidth: 0,
                 backgroundColor: ["#CD5C5C", "#a9c722", "#c77722"],
                 data: [
-                  this.factoryCtg.BLF,
-                  this.factoryCtg.EF,
-                  this.factoryCtg.IT
+                  this.factoryCtgState.BLF,
+                  this.factoryCtgState.EF,
+                  this.factoryCtgState.IT
                 ]
               }
             ]
@@ -746,25 +692,6 @@ export default {
     //       {
     //         label: "Data One",
     //         backgroundColor: ["#c77722"],
-    //         data: [40, 39, 10, 40, 39]
-    //       }
-    //     ]
-    //   };
-    // },
-
-    // fillDataPie() {
-    //   this.datacollectionPie = {
-    //     labels: ["January", "February", "March", "April", "May"],
-    //     datasets: [
-    //       {
-    //         label: "Data One",
-    //         backgroundColor: [
-    //           "#CD5C5C",
-    //           "#a9c722",
-    //           "#c77722",
-    //           "#22c738",
-    //           "#d667c4"
-    //         ],
     //         data: [40, 39, 10, 40, 39]
     //       }
     //     ]

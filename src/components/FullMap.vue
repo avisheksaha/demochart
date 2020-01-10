@@ -20,18 +20,44 @@
             :visible="tileProvider.visible"
             :url="tileProvider.url"
             :attribution="tileProvider.attribution"
-            :token="token"
             layer-type="base"
           />
-          <l-marker
+
+          <!-- :token="token" -->
+
+          <!-- <l-marker
             v-for="marker in markers"
             :key="marker.id"
             :lat-lng="marker.position"
+            :backgroundColor="green"
+            :fillColor="circle.fillColor"
             @click="modalShow = !modalShow"
+          >-->
+
+          <l-marker
+            v-for="factory in dataLocations.factories"
+            :key="factory.factory_id"
+            :lat-lng="factory.position"
+            @click="toggledrawLines(factory)"
           >
-            <l-tooltip>{{ marker.id }}</l-tooltip>
-            <l-popup>{{ marker.id }}</l-popup>
+            <l-tooltip>{{ factory.factory_id }}</l-tooltip>
+            <l-popup>{{ factory.factory_id }}</l-popup>
           </l-marker>
+
+          <div v-for="(factoryGrower,index) in dataLocations.factories" :key="index">
+            <l-marker
+              v-for="(grower,index) in factoryGrower.growers"
+              :key="index"
+              :lat-lng="grower.position"
+            >
+              <l-tooltip>{{ grower.grower_id }}</l-tooltip>
+              <l-popup>{{ grower.grower_id }}</l-popup>
+            </l-marker>
+          </div>
+
+          <!-- <l-marker :lat-lng="grab.position" @click="drawLines(grab)"></l-marker> -->
+          <l-polyline :lat-lngs="polyline.latlngs" :color="polyline.color"></l-polyline>
+
           <l-circle-marker
             :lat-lng="circle.center"
             :radius="circle.radius"
@@ -57,6 +83,7 @@
 <script>
 import {
   LMap,
+  LPolyline,
   LTileLayer,
   LMarker,
   LCircleMarker,
@@ -79,6 +106,11 @@ const options = {
 export default {
   data() {
     return {
+      showLines: false,
+      polyline: {
+        latlngs: [],
+        color: "green"
+      },
       modalShow: false,
       modalShowPolylineFinish: false,
       dist: null,
@@ -111,6 +143,38 @@ export default {
         fillColor: "#26291a",
         fillOpacity: 1
       },
+      dataLocations: {
+        factories: [
+          {
+            factory_id: 101,
+            position: [28.66, 77.23],
+            growers: [
+              {
+                grower_id: 1,
+                position: [28.6136, 77.23]
+              },
+              {
+                grower_id: 2,
+                position: [28.62, 77.21]
+              }
+            ]
+          },
+          {
+            factory_id: 102,
+            position: [28.67, 77.24],
+            growers: [
+              {
+                grower_id: 3,
+                position: [28.628, 77.25]
+              },
+              {
+                grower_id: 4,
+                position: [28.632, 77.29]
+              }
+            ]
+          }
+        ]
+      },
 
       markers: [
         {
@@ -127,6 +191,7 @@ export default {
   components: {
     LMap,
     LMarker,
+    LPolyline,
     LCircleMarker,
     LControlLayers,
     LTileLayer,
@@ -135,6 +200,34 @@ export default {
     LControlPolylineMeasure
   },
   methods: {
+    toggledrawLines(factory) {
+      this.showLines = !this.showLines;
+      this.drawLines(factory);
+    },
+    drawLines(factory) {
+      if (this.showLines == true) {
+        var fact = factory;
+        // console.log(fact, "kkkk");
+        var latlngsff = Array();
+        fact.growers.forEach(element => {
+          latlngsff.push(factory.position);
+          latlngsff.push(element.position);
+          this.polyline.latlngs = latlngsff;
+        });
+      }
+      if (this.showLines == false) {
+        console.log(false);
+        this.polyline.latlngs = [];
+      }
+
+      // console.log(this.polyline.latlngs);
+      // latlngsff.push(this.marker1);
+      // latlngsff.push(this.marker2);
+      // latlngsff.push(this.marker3);
+      // latlngsff.push(this.marker4);
+      // this.polyline.latlngs = latlngsff;
+      // this.this.polyline = L.polyline(latlngs, { color: "red" }).addTo(map);
+    },
     showme() {
       console.log("sdsdsd");
     },
