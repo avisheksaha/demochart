@@ -71,7 +71,7 @@
                 @change="stateSelected(selectState.id)"
                 id="inlineFormCustomSelectPref"
               >
-                <!-- <option selected>Choose...</option> -->
+                <option value="null" disabled>Choose a state</option>
                 <option
                   v-for="(gotState, index) in gotStates"
                   :key="index"
@@ -88,7 +88,7 @@
               @change="districtSelected(selectDistrict)"
               id="inlineFormCustomSelectPref1"
             >
-              <!-- <option selected>Choose...</option> -->
+              <option selected>All</option>
               <option
                 v-for="(district, index) in selectState.districts"
                 :key="index"
@@ -100,16 +100,7 @@
         <div class="row row2">
           <div class="col-md-6 full-height pr-0">
             <div class="card bg-dark text-white ht20">
-              <span
-                class="px-4 pt-2"
-                style="font-size: 20px;"
-                v-if="(selectState && !(selectDistrict))"
-              >Total Factories: {{factoryCtgState.total}}</span>
-              <span
-                class="px-4 pt-2"
-                style="font-size: 20px;"
-                v-else-if="(selectState && selectDistrict)"
-              >Total Factories: {{factoryCtg.total}}</span>
+              <span class="px-4 pt-2" style="font-size: 20px;">Total Factories: {{factoryCtg.total}}</span>
             </div>
             <div class="card bg-dark text-white pb-2 ht80">
               <piefactorycatg-chart
@@ -127,14 +118,10 @@
                 <h5>Total Installed Capacity</h5>
               </div>
               <div>
-                <h1 class="mt-2" v-if="(selectState && !(selectDistrict))">
-                  {{factoryCtgState.Installed_Capacity}}
+                <h1 class="mt-2">
+                  {{factoryCtg.Installed_Capacity || 0}}
                   <span style="font-size:24px;">kg</span>
                 </h1>
-                <h1
-                  class="mt-2"
-                  v-else-if="(selectDistrict && selectState)"
-                >{{factoryCtg.installed_capacity}} kg</h1>
               </div>
             </div>
             <div
@@ -144,14 +131,7 @@
                 <h5>Registered with Chai-Sahyog</h5>
               </div>
               <div>
-                <h1
-                  class="mt-2"
-                  v-if="(selectState && !(selectDistrict))"
-                >{{factoryCtgState.Registered_Factory}}</h1>
-                <h1
-                  class="mt-2"
-                  v-else-if="(selectState && selectDistrict)"
-                >{{factoryCtg.Registered_Factory}}</h1>
+                <h1 class="mt-2">{{factoryCtg.Registered_Factory}}</h1>
               </div>
             </div>
           </div>
@@ -252,7 +232,6 @@ export default {
 
       gotStates: [],
       selectState: null,
-      factoryCtgState: {},
       factoryCtg: {},
       locationsState: null,
 
@@ -273,29 +252,41 @@ export default {
     LTooltip,
     LPopup
   },
+  watch: {
+    selectState(newValue, oldValue) {
+      if (newValue != oldValue) {
+        this.selectDistrict = null;
+      }
+    }
+  },
   mounted() {
     this.receiveStates();
   },
   methods: {
     receiveStates() {
       this.axios
-        .get("http://bad1a99b.ngrok.io/api/v1/state-list")
+        .get("http://f87fb9d3.ngrok.io/api/v1/state-list")
         .then(response => {
           this.gotStates = response.data.data;
         })
         .catch();
     },
-    stateSelected(selectState) {
-      this.factoryCatgState(selectState);
-      this.factoryLocnState(selectState);
+
+    stateSelected(selectedStateId) {
+      // this.selectDistrict = null;
+      this.factoryCatgState(selectedStateId);
+      this.factoryLocnState(selectedStateId);
     },
-    factoryCatgState(selectState) {
+
+    factoryCatgState(selectedStateId) {
+      this.factoryCtg = {};
+
       this.axios
         .get(
-          `http://bad1a99b.ngrok.io/api/v1/state/factory-category/${selectState}`
+          `http://f87fb9d3.ngrok.io/api/v1/state/factory-category/${selectedStateId}`
         )
         .then(response => {
-          this.factoryCtgState = response.data.data;
+          this.factoryCtg = response.data.data;
 
           this.datacollectionFactoryCatgPie = {
             labels: ["BLF", "EF", "IT"],
@@ -305,9 +296,9 @@ export default {
                 label: "Data One",
                 backgroundColor: ["#CD5C5C", "#a9c722", "#c77722"],
                 data: [
-                  this.factoryCtgState.BLF,
-                  this.factoryCtgState.EF,
-                  this.factoryCtgState.IT
+                  this.factoryCtg.BLF,
+                  this.factoryCtg.EF,
+                  this.factoryCtg.IT
                 ]
               }
             ]
@@ -315,17 +306,18 @@ export default {
         })
         .catch();
     },
-    factoryLocnState(selectState) {
+
+    factoryLocnState(selectedStateId) {
       this.axios
         .get(
-          `http://bad1a99b.ngrok.io/api/v1/state/factory/location/${selectState}`
+          `http://f87fb9d3.ngrok.io/api/v1/state/factory/location/${selectedStateId}`
         )
         .then(response => {
           // this.markers = response.data.data.factoryloc;
           this.center = response.data.data.location;
           let floc = response.data.data.factory_location;
           console.log(floc);
-          this.markers.splice(0);
+          this.markers.splice(0, this.markers.length);
           floc.forEach(element => {
             let flocVar = {
               factory_id: element.factory_id,
@@ -340,14 +332,20 @@ export default {
         })
         .catch();
     },
-    districtSelected(selectDistrict) {
-      this.factoryCatg(selectDistrict);
-      this.factoryLocn(selectDistrict);
+
+    districtSelected(selectedDistrictName) {
+      if (this.selectDistrict == null) {
+        return;
+      }
+      this.factoryCatg(selectedDistrictName);
+      this.factoryLocn(selectedDistrictName);
     },
-    factoryCatg(selectDistrict) {
+
+    factoryCatg(selectedDistrictName) {
+      this.factoryCtg = {};
       this.axios
         .get(
-          `http://bad1a99b.ngrok.io/api/v1/district/factory-category/${selectDistrict}`
+          `http://f87fb9d3.ngrok.io/api/v1/district/factory-category/${selectedDistrictName}`
         )
         .then(response => {
           this.factoryCtg = response.data.data;
@@ -369,17 +367,17 @@ export default {
         })
         .catch();
     },
-    factoryLocn(selectDistrict) {
+    factoryLocn(selectedDistrictName) {
       this.axios
         .get(
-          `http://bad1a99b.ngrok.io/api/v1/district/factory/location/${selectDistrict}`
+          `http://f87fb9d3.ngrok.io/api/v1/district/factory/location/${selectedDistrictName}`
         )
         .then(response => {
           // this.markers = response.data.data.factoryloc;
           this.center = response.data.data.location;
           let floc = response.data.data.factory_location;
           console.log(floc);
-          this.markers.splice(0);
+          this.markers.splice(0, this.markers.length);
           floc.forEach(element => {
             let flocVar = {
               factory_id: element.factory_id,
@@ -398,7 +396,8 @@ export default {
     openFactoryModal(marker) {
       this.modalFactory = true;
       this.factoryDetailsInModal = marker;
-      console.log(this.factoryDetailsInModal.factory_name);
+      console.log(this.selectState.name);
+      console.log(this.selectDistrict);
     }
     // updateCordinates(event) {
     //   // console.log("sdsdsd");
