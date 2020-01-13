@@ -264,7 +264,7 @@ export default {
   methods: {
     receiveStates() {
       this.axios
-        .get("http://f87fb9d3.ngrok.io/api/v1/state-list")
+        .get("http://019ce0f3.ngrok.io/api/v1/state-list")
         .then(response => {
           this.gotStates = response.data.data;
         })
@@ -282,7 +282,7 @@ export default {
 
       this.axios
         .get(
-          `http://f87fb9d3.ngrok.io/api/v1/state/factory-category/${selectedStateId}`
+          `http://019ce0f3.ngrok.io/api/v1/state/factory-category/${selectedStateId}`
         )
         .then(response => {
           this.factoryCtg = response.data.data;
@@ -309,7 +309,7 @@ export default {
     factoryLocnState(selectedStateId) {
       this.axios
         .get(
-          `http://f87fb9d3.ngrok.io/api/v1/state/factory/location/${selectedStateId}`
+          `http://019ce0f3.ngrok.io/api/v1/state/factory/location/${selectedStateId}`
         )
         .then(response => {
           // this.markers = response.data.data.factoryloc;
@@ -344,7 +344,7 @@ export default {
       this.factoryCtg = {};
       this.axios
         .get(
-          `http://f87fb9d3.ngrok.io/api/v1/district/factory-category/${selectedDistrictName}`
+          `http://019ce0f3.ngrok.io/api/v1/district/factory-category/${selectedDistrictName}`
         )
         .then(response => {
           this.factoryCtg = response.data.data;
@@ -369,7 +369,7 @@ export default {
     factoryLocn(selectedDistrictName) {
       this.axios
         .get(
-          `http://f87fb9d3.ngrok.io/api/v1/district/factory/location/${selectedDistrictName}`
+          `http://019ce0f3.ngrok.io/api/v1/district/factory/location/${selectedDistrictName}`
         )
         .then(response => {
           // this.markers = response.data.data.factoryloc;

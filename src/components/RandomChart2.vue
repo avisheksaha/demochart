@@ -44,19 +44,25 @@
       <div class="col-md-4 pr-0 full-height">
         <div class="row ht20">
           <div class="col-md-6 pr-0 full-height">
-            <div
-              class="card bg-dark full-height text-white d-flex justify-content-center align-items-center"
-            >
-              <h6>Total number of Small Growers</h6>
-              <h3>{{this.growersDataState.Grower_count}}</h3>
+            <div class="card bg-dark full-height">
+              <div
+                class="card-body text-white"
+                style="padding-top:10px !important; padding-bottom:0px !important;"
+              >
+                <h6 class="titleCard">Total number of Small Growers</h6>
+                <h2 class="cardValue mt-1">{{this.growersDataState.Grower_count}}</h2>
+              </div>
             </div>
           </div>
           <div class="col-md-6 full-height" style="padding-left:5px !important;">
-            <div
-              class="card bg-dark full-height text-white d-flex justify-content-center align-items-center"
-            >
-              <h6>Total area under plantation</h6>
-              <h4>{{this.growersDataState.total_plantation}}</h4>
+            <div class="card bg-dark full-height">
+              <div
+                class="card-body text-white"
+                style="padding-top:10px !important; padding-bottom:0px !important;"
+              >
+                <h6 class="titleCard">Total area under plantation</h6>
+                <h2 class="cardValue mt-1">{{this.growersDataState.total_plantation}}</h2>
+              </div>
             </div>
           </div>
         </div>
@@ -73,64 +79,23 @@
         </div>
       </div>
       <div
-        class="col-md-5 full-height"
+        class="col-md-4 full-height"
         style="padding-left: 5px !important; padding-right: 0px !important;"
       >
-        <div class="row ht20">
-          <div class="col-md-6 pr-0 full-height">
-            <div
-              class="card bg-dark full-height text-white d-flex justify-content-center align-items-center"
-            >
-              <h5 class="titleCard">Total Installed Capacity</h5>
-              <h4 class="cardValue">123456</h4>
-            </div>
-          </div>
-          <div class="col-md-6 full-height" style="padding-left:5px !important;">
-            <div
-              class="card bg-dark full-height text-white d-flex justify-content-center align-items-center"
-            >
-              <h6 class="titleCard">Total Production(2020-2021)</h6>
-              <h2 class="cardValue">90876</h2>
-            </div>
-          </div>
-        </div>
-        <div class="row ht80">
-          <div class="col-md-12 full-height">
-            <div class="card px-4 bg-dark full-height" style="padding-left: 5px;">
-              <barqrcode-chart
-                :chart-data="datacollectionBarQrCode"
-                :options="optionsbar"
-                :styles="myStyles"
-              ></barqrcode-chart>
-            </div>
-          </div>
+        <div style="height: 100%;">
+          <l-map style="height: 100%; width: 100%" :zoom="zoom" :center="center">
+            <l-tile-layer :url="url" :attribution="attribution"></l-tile-layer>
+            <l-marker :lat-lng="markerLatLng"></l-marker>
+          </l-map>
         </div>
       </div>
-      <div class="col-md-3 full-height" style="padding-left: 5px;">
-        <div class="row ht70">
-          <div class="col-md-12 full-height">
-            <div class="card bg-dark full-height px-4">
-              <doughnutmalefemale-chart
-                :chart-data="datacollectionDoughnutMaleFemale"
-                :options="options"
-                :style="myStyles"
-              ></doughnutmalefemale-chart>
-            </div>
-          </div>
-        </div>
-        <div class="row ht30 pt-1">
-          <div class="col-md-12 full-height">
-            <div
-              class="card bg-dark full-height text-white d-flex justify-content-center align-items-center"
-            >
-              <div>
-                <h6>Number of Registered Brokers</h6>
-              </div>
-              <div>
-                <h3 style="color:#7eff47;">12345</h3>
-              </div>
-            </div>
-          </div>
+      <div class="col-md-4 full-height" style="padding-left: 5px;">
+        <div class="card px-4 bg-dark full-height">
+          <barqrcode-chart
+            :chart-data="datacollectionBarQrCode"
+            :options="optionsbar"
+            :styles="myStyles"
+          ></barqrcode-chart>
         </div>
       </div>
     </div>
@@ -177,40 +142,18 @@
         </div>
       </div>
       <div class="col-md-3 full-height" style="padding-left:5px !important;">
-        <div class="row ht50">
-          <div class="col-md-12">
-            <div
-              class="card bg-dark full-height text-white d-flex justify-content-center align-items-center"
-            >
-              <div>
-                <h6>Growers Location Updated</h6>
-              </div>
-              <div>
-                <h3 style="color:#7eff47;">150/235</h3>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div class="row ht49 my-1">
-          <div class="col-md-12">
-            <div
-              class="card bg-dark full-height text-white d-flex justify-content-center align-items-center"
-            >
-              <div>
-                <h6>Factories Location Updated</h6>
-              </div>
-              <div>
-                <h3 style="color:#7eff47;">124 / 200</h3>
-              </div>
-            </div>
-          </div>
-        </div>
+        <div class="card bg-dark full-height"></div>
       </div>
     </div>
   </div>
 </template>
 
 <script>
+import { LMap, LTileLayer, LMarker } from "vue2-leaflet";
+
+// Vue.component("l-map", Vue2Leaflet.LMap);
+// Vue.component("l-tile-layer", Vue2Leaflet.LTileLayer);
+// Vue.component("l-circle", Vue2Leaflet.LCircle);
 // import LineChart from "./charts/LineChart.js";
 // import BarChart from "./charts/BarChart.js";
 // import PieChart from "./charts/PieChart.js";
@@ -386,6 +329,9 @@ const optionspie = {
 
 export default {
   components: {
+    LMap,
+    LTileLayer,
+    LMarker,
     // LineChart,
     // BarChart,
     // PieChart,
@@ -775,32 +721,11 @@ export default {
   height: 100%;
 }
 .ht20 {
-  height: 25%;
-}
-.ht32 {
-  height: 32%;
-}
-.ht33 {
-  height: 33%;
-}
-.ht34 {
-  height: 34%;
+  height: 20%;
 }
 .ht80 {
   margin-top: 1%;
-  height: 74%;
-}
-.ht70 {
-  height: 70%;
-}
-.ht30 {
-  height: 30%;
-}
-.ht50 {
-  height: 50%;
-}
-.ht49 {
-  height: 49%;
+  height: 79%;
 }
 @media only screen and (min-width: 801px) and (max-width: 1024px) {
 }

@@ -3,7 +3,8 @@
     class="container-fluid overflow-hidden full-height"
     style="padding-left: 0px !important; padding-right: 0px !important;"
   >
-    <div class="row full-height">
+    <div class="row h10"></div>
+    <div class="row h80">
       <div class="col-md-12 full-height">
         <l-map
           style="height: 100%; width:100%"
@@ -33,25 +34,37 @@
             :fillColor="circle.fillColor"
             @click="modalShow = !modalShow"
           >-->
-
-          <l-marker
-            v-for="factory in dataLocations.factories"
-            :key="factory.factory_id"
-            :lat-lng="factory.position"
-            @click="toggledrawLines(factory)"
-          >
-            <l-tooltip>{{ factory.factory_id }}</l-tooltip>
-            <l-popup>{{ factory.factory_id }}</l-popup>
-          </l-marker>
-
-          <div v-for="(factoryGrower,index) in dataLocations.factories" :key="index">
+          <div v-if="showFactoryGrowerLocations">
             <l-marker
-              v-for="(grower,index) in factoryGrower.growers"
-              :key="index"
-              :lat-lng="grower.position"
+              v-for="factory in dataLocations.factories"
+              :key="factory.factory_id"
+              :lat-lng="factory.position"
+              @click="toggledrawLines(factory)"
             >
-              <l-tooltip>{{ grower.grower_id }}</l-tooltip>
-              <l-popup>{{ grower.grower_id }}</l-popup>
+              <l-tooltip>{{ factory.factory_id }}</l-tooltip>
+              <l-popup>{{ factory.factory_id }}</l-popup>
+            </l-marker>
+
+            <div v-for="(factoryGrower,index) in dataLocations.factories" :key="index">
+              <l-marker
+                v-for="(grower,index) in factoryGrower.growers"
+                :key="index"
+                :lat-lng="grower.position"
+              >
+                <l-tooltip>{{ grower.grower_id }}</l-tooltip>
+                <l-popup>{{ grower.grower_id }}</l-popup>
+              </l-marker>
+            </div>
+          </div>
+
+          <div v-if="showTeaboardLocation">
+            <l-marker
+              v-for="(teaboardOffice,index) in dataLocations.teaboardOffices"
+              :key="index"
+              :lat-lng="teaboardOffice.position"
+            >
+              <l-tooltip>{{ teaboardOffice.office_id }}</l-tooltip>
+              <l-popup>{{ teaboardOffice.office_id }}</l-popup>
             </l-marker>
           </div>
 
@@ -75,6 +88,27 @@
             <span style="font-size: 27px;">km</span>
           </h1>
         </b-modal>
+      </div>
+    </div>
+    <div class="row h10 px-4">
+      <div class="col text-center my-auto mx-auto border-right">
+        <button
+          type="button"
+          class="btn btn-outline-light btn-lg btn-block"
+          @click="openFactoryGrowerLocations"
+        >Factories and Growers</button>
+      </div>
+      <div class="col text-center my-auto mx-auto border-right" @click="openTeaboardLocations">
+        <button type="button" class="btn btn-outline-light btn-lg btn-block">Tea-board Office</button>
+      </div>
+      <div class="col text-center my-auto mx-auto border-right">
+        <button type="button" class="btn btn-outline-light btn-lg btn-block">BLF</button>
+      </div>
+      <div class="col text-center my-auto mx-auto border-right">
+        <button type="button" class="btn btn-outline-light btn-lg btn-block">EF</button>
+      </div>
+      <div class="col text-center my-auto mx-auto">
+        <button type="button" class="btn btn-outline-light btn-lg btn-block">IT</button>
       </div>
     </div>
   </div>
@@ -107,6 +141,8 @@ export default {
   data() {
     return {
       showLines: false,
+      showFactoryGrowerLocations: true,
+      showTeaboardLocation: false,
       polyline: {
         latlngs: [],
         color: "green"
@@ -156,6 +192,18 @@ export default {
               {
                 grower_id: 2,
                 position: [28.62, 77.21]
+              },
+              {
+                grower_id: 3,
+                position: [28.64, 77.228]
+              },
+              {
+                grower_id: 4,
+                position: [28.618, 77.224]
+              },
+              {
+                grower_id: 5,
+                position: [28.624, 77.218]
               }
             ]
           },
@@ -164,14 +212,36 @@ export default {
             position: [28.67, 77.24],
             growers: [
               {
-                grower_id: 3,
+                grower_id: 9,
                 position: [28.628, 77.25]
               },
               {
-                grower_id: 4,
+                grower_id: 10,
                 position: [28.632, 77.29]
               }
             ]
+          }
+        ],
+        teaboardOffices: [
+          {
+            office_id: "O-441",
+            position: [28.63, 77.05]
+          },
+          {
+            office_id: "0-442",
+            position: [28.6345, 77.09]
+          },
+          {
+            office_id: "0-443",
+            position: [28.6998, 77.1]
+          },
+          {
+            office_id: "0-443",
+            position: [28.6789, 77.12124]
+          },
+          {
+            grower_id: 5,
+            position: [28.624, 77.218]
           }
         ]
       },
@@ -200,6 +270,9 @@ export default {
     LControlPolylineMeasure
   },
   methods: {
+    openFactoryGrowerLocations() {
+      this.showFactoryGrowerLocations = !this.showFactoryGrowerLocations;
+    },
     toggledrawLines(factory) {
       this.showLines = !this.showLines;
       this.drawLines(factory);
@@ -219,15 +292,11 @@ export default {
         console.log(false);
         this.polyline.latlngs = [];
       }
-
-      // console.log(this.polyline.latlngs);
-      // latlngsff.push(this.marker1);
-      // latlngsff.push(this.marker2);
-      // latlngsff.push(this.marker3);
-      // latlngsff.push(this.marker4);
-      // this.polyline.latlngs = latlngsff;
-      // this.this.polyline = L.polyline(latlngs, { color: "red" }).addTo(map);
     },
+    openTeaboardLocations() {
+      this.showTeaboardLocation = !this.showTeaboardLocation;
+    },
+
     showme() {
       console.log("sdsdsd");
     },
@@ -250,5 +319,25 @@ export default {
 <style scoped>
 .full-height {
   height: 100%;
+}
+.h10 {
+  height: 10%;
+}
+.h20 {
+  height: 20%;
+}
+.h70 {
+  height: 70%;
+}
+.h80 {
+  height: 80%;
+}
+.bottomTexts {
+  font-size: 20px;
+}
+.bottomTexts:hover {
+  font-size: 22px;
+  background: white;
+  color: #999999;
 }
 </style>
