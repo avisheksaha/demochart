@@ -48,7 +48,7 @@
               class="card bg-dark full-height text-white d-flex justify-content-center align-items-center"
             >
               <h6>Total number of Small Growers</h6>
-              <h3>{{this.growersDataState.Grower_count}}</h3>
+              <h3 style="color:#7eff47;">{{this.growersDataState.Grower_count}}</h3>
             </div>
           </div>
           <div class="col-md-6 full-height" style="padding-left:5px !important;">
@@ -56,7 +56,7 @@
               class="card bg-dark full-height text-white d-flex justify-content-center align-items-center"
             >
               <h6>Total area under plantation</h6>
-              <h4>{{this.growersDataState.total_plantation}}</h4>
+              <h4 style="color:#7eff47;">{{this.growersDataState.total_plantation}}</h4>
             </div>
           </div>
         </div>
@@ -82,7 +82,7 @@
               class="card bg-dark full-height text-white d-flex justify-content-center align-items-center"
             >
               <h5 class="titleCard">Total Installed Capacity</h5>
-              <h4 class="cardValue">123456</h4>
+              <h4 class="cardValue" style="color:#7eff47;">123456</h4>
             </div>
           </div>
           <div class="col-md-6 full-height" style="padding-left:5px !important;">
@@ -90,7 +90,7 @@
               class="card bg-dark full-height text-white d-flex justify-content-center align-items-center"
             >
               <h6 class="titleCard">Total Production(2020-2021)</h6>
-              <h2 class="cardValue">90876</h2>
+              <h2 class="cardValue" style="color:#7eff47;">90876</h2>
             </div>
           </div>
         </div>
@@ -136,7 +136,7 @@
     </div>
     <div class="row row3">
       <div class="col-md-3 full-height" style="padding-right:0px !important;">
-        <div class="card bg-dark full-height px-4">
+        <div class="card bg-dark full-height px-4 pb-2">
           <doughnutmalefemale-chart
             :chart-data="datacollectionDoughnutMaleFemale"
             :options="options"
@@ -165,7 +165,7 @@
             <h6 class="text-white">Total factories:</h6>
           </div>
           <div class="pl-2 text-white">
-            <h4>{{ this.factoryCtgState.total }}</h4>
+            <h4 style="color:#7eff47;">{{ this.factoryCtgState.total }}</h4>
           </div>
         </div>
         <div class="card bg-dark ht80">
@@ -473,7 +473,7 @@ export default {
             datasets: [
               {
                 label: "Data One",
-                backgroundColor: ["#B83125", "#027585"],
+                backgroundColor: ["#464dee", "#0ddbb9"],
                 borderWidth: 0,
                 data: [
                   this.growersDataState.Male_count,
@@ -495,12 +495,12 @@ export default {
               {
                 label: "QR code generation Progress",
                 backgroundColor: [
-                  "#2E9CA6",
-                  "#DC3F76",
-                  "#7446B9",
-                  "#C0C0C0",
-                  "#F96232",
-                  "#9FB328"
+                  "#748adb",
+                  "#5267b3",
+                  "#a1aacc",
+                  "#6c88f5",
+                  "#475eba",
+                  "#294fe6"
                 ],
                 pointBackgroundColor: "white",
                 borderWidth: 0,
@@ -522,11 +522,11 @@ export default {
               {
                 label: "Number of growers under certain area of Plantation",
                 backgroundColor: [
-                  "#4A759E",
-                  "#4A759E",
-                  "#4A759E",
-                  "#4A759E",
-                  "#4A759E"
+                  "#0ddbb9",
+                  "#0ddbb9",
+                  "#0ddbb9",
+                  "#0ddbb9",
+                  "#0ddbb9"
                 ],
                 pointBackgroundColor: "white",
                 borderWidth: 0,
@@ -542,16 +542,17 @@ export default {
             ]
           };
           this.datacollectionDoughnutCaste = {
+            //
             labels: ["ST", "SC", "OBC", "MOBC", "GEN"],
             datasets: [
               {
                 label: "Data One",
                 backgroundColor: [
-                  "#2E9CA6",
-                  "#DC3F76",
-                  "#7446B9",
-                  "#C0C0C0",
-                  "#F96232"
+                  "#57c7d4",
+                  "#f6e84e",
+                  "#46c35f",
+                  "#f96868",
+                  "#f2a654"
                 ],
                 borderWidth: 0,
                 data: [
@@ -582,7 +583,7 @@ export default {
             datasets: [
               {
                 label: "Data One",
-                backgroundColor: ["#CD5C5C", "#a9c722", "#c77722"],
+                backgroundColor: ["#f6e84e", "#5e50f9", "#0ddbb9"],
                 borderWidth: 0,
                 data: [
                   this.factoryCtgState.BLF,
@@ -691,11 +692,11 @@ export default {
                 label: "Data One",
                 borderWidth: 0,
                 backgroundColor: [
-                  "#2E9CA6",
-                  "#DC3F76",
-                  "#7446B9",
-                  "#C0C0C0",
-                  "#F96232"
+                  "#57c7d4",
+                  "#58d8a3",
+                  "#46c35f",
+                  "#f6e84e",
+                  "#f2a654"
                 ],
                 data: [
                   this.growersDataState.ST,
