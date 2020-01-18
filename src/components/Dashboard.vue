@@ -7,17 +7,26 @@
         <div style="position: fixed">
           <p class="text-muted" style="font-size: 16px;">Web Development</p>
           <p class="text-muted" style="font-size: 16px;">Design</p>
-          <p class="text-muted" style="font-size: 16px;">Invention and Inventions</p>
+          <p class="text-muted" style="font-size: 16px;">
+            Invention and Inventions
+          </p>
           <p class="text-muted" style="font-size: 16px;">Mobile Phones</p>
           <p class="text-muted" style="font-size: 16px;">Technologies</p>
           <p class="text-muted" style="font-size: 16px;">Science</p>
           <p class="text-muted" style="font-size: 16px;">Web Development</p>
-          <p class="text-muted" style="font-size: 16px;">Invention and Inventions</p>
+          <p class="text-muted" style="font-size: 16px;">
+            Invention and Inventions
+          </p>
           <p class="text-muted" style="font-size: 16px;">Feed</p>
         </div>
       </div>
       <div class="col-md-7 pl-5">
-        <button class="btn btn-danger mb-1" @click="toggle_question = !toggle_question">Ask Question</button>
+        <button
+          class="btn btn-danger mb-1"
+          @click="toggle_question = !toggle_question"
+        >
+          Ask Question
+        </button>
         <div v-if="toggle_question">
           <div class="my-2">
             <div class="form-group" style="margin-bottom: 2px!important;">
@@ -27,7 +36,9 @@
                 v-model="title"
                 placeholder="Title Of Question"
               />
-              <div v-if="errors && errors.title" class="text-danger">{{ errors.title[0] }}</div>
+              <div v-if="errors && errors.title" class="text-danger">
+                {{ errors.title[0] }}
+              </div>
             </div>
             <div class="mb-1">
               <ckeditor
@@ -36,11 +47,20 @@
                 :config="editorConfig"
                 class="rounded-lg"
               ></ckeditor>
-              <div v-if="errors && errors.content" class="text-danger">{{ errors.content[0] }}</div>
+              <div v-if="errors && errors.content" class="text-danger">
+                {{ errors.content[0] }}
+              </div>
             </div>
             <div>
-              <input-tag placeholder="Add Tag" v-model="tags" :limit="3" class="rounded-lg"></input-tag>
-              <div v-if="errors && errors.tags" class="text-danger">{{ errors.tags[0] }}</div>
+              <input-tag
+                placeholder="Add Tag"
+                v-model="tags"
+                :limit="3"
+                class="rounded-lg"
+              ></input-tag>
+              <div v-if="errors && errors.tags" class="text-danger">
+                {{ errors.tags[0] }}
+              </div>
             </div>
             <div>
               <file-input
@@ -52,14 +72,22 @@
                 :errors="errors['article_image_path']"
               ></file-input>
             </div>
-            <button class="btn btn-primary my-1" @click="createArticle">Create</button>
+            <button class="btn btn-primary my-1" @click="createArticle">
+              Create
+            </button>
           </div>
         </div>
-        <div v-for="(gotarticle,index) in gotarticles" :key="index" class="mb-2">
+        <div
+          v-for="(gotarticle, index) in gotarticles"
+          :key="index"
+          class="mb-2"
+        >
           <div class="card card-body shadow-sm">
             <div class="row">
               <div class="col-md-2 px-2">
-                <div class="text-center align-middle border border-info rounded-lg my-2">
+                <div
+                  class="text-center align-middle border border-info rounded-lg my-2"
+                >
                   <span style="font-size:20px;">10</span>
                   <p style="font-size:12px;">Votes</p>
                 </div>
@@ -72,8 +100,10 @@
               </div>
               <div class="col-md-10">
                 <!-- {{gotarticle.article_tags}} -->
-                <router-link :to="{name: 'article-page', params: {id: gotarticle.id}}">
-                  <h5 class="text-dark">{{gotarticle.title}}</h5>
+                <router-link
+                  :to="{ name: 'article-page', params: { id: gotarticle.id } }"
+                >
+                  <h5 class="text-dark">{{ gotarticle.title }}</h5>
                 </router-link>
                 <ul class="list-unstyled">
                   <li class="media">
@@ -86,13 +116,13 @@
                     </div>
                   </li>
                 </ul>
-                <div style="font-size: 15px;" v-html=" gotarticle.content "></div>
+                <div style="font-size: 15px;" v-html="gotarticle.content"></div>
                 <span
-                  v-for="(tag,index) in gotarticle.article_tags"
+                  v-for="(tag, index) in gotarticle.article_tags"
                   :key="index"
                   class="border border-info px-2 pb-1 mr-2 bg-light text-primary rounded-sm"
                 >
-                  <small>{{tag}}</small>
+                  <small>{{ tag }}</small>
                 </span>
               </div>
             </div>
@@ -211,4 +241,4 @@ export default {
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
-<style scoped></style>
+<style></style>

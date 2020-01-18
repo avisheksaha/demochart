@@ -48,7 +48,7 @@
               class="card bg-dark full-height text-white d-flex justify-content-center align-items-center"
             >
               <h6>Total number of Small Growers</h6>
-              <h3 style="color:#7eff47;">{{this.growersDataState.Grower_count}}</h3>
+              <h3 style="color:#7eff47;">{{ this.growersDataState.Grower_count }}</h3>
             </div>
           </div>
           <div class="col-md-6 full-height" style="padding-left:5px !important;">
@@ -56,7 +56,7 @@
               class="card bg-dark full-height text-white d-flex justify-content-center align-items-center"
             >
               <h6>Total area under plantation</h6>
-              <h4 style="color:#7eff47;">{{this.growersDataState.total_plantation}}</h4>
+              <h4 style="color:#7eff47;">{{ this.growersDataState.total_plantation }}</h4>
             </div>
           </div>
         </div>
@@ -82,7 +82,7 @@
               class="card bg-dark full-height text-white d-flex justify-content-center align-items-center"
             >
               <h5 class="titleCard">Total Installed Capacity</h5>
-              <h4 class="cardValue" style="color:#7eff47;">123456</h4>
+              <h4 class="cardValue" style="color:#7eff47;">{{ factoryCtgState.Installed_Capacity }}</h4>
             </div>
           </div>
           <div class="col-md-6 full-height" style="padding-left:5px !important;">
@@ -225,6 +225,10 @@ import PiefactorycatgChart from "./charts/PiefactorycatgChart.js";
 const options = {
   responsive: true,
   maintainAspectRatio: false,
+  tooltips: { enabled: false },
+  pieceLabel: {
+    mode: "value"
+  },
   cutoutPercentage: 65,
   segmentShowStroke: false,
 
@@ -253,6 +257,7 @@ const options = {
 const optionsbar = {
   responsive: true,
   maintainAspectRatio: false,
+  // tooltips: { enabled: false },
   legend: {
     // position: "right",
     labels: {
@@ -290,6 +295,7 @@ const optionsbar = {
 const optionsbarareavsgrower = {
   responsive: true,
   maintainAspectRatio: false,
+  tooltips: { enabled: false },
   legend: {
     // position: "right",
     labels: {
@@ -337,6 +343,7 @@ const optionsbarareavsgrower = {
 const optionssemidough = {
   responsive: true,
   maintainAspectRatio: false,
+  tooltips: { enabled: false },
   cutoutPercentage: 70,
 
   animation: {
@@ -364,6 +371,7 @@ const optionssemidough = {
 const optionspie = {
   responsive: true,
   maintainAspectRatio: false,
+  tooltips: { enabled: false },
   animation: {
     animateRotate: true,
     animateScale: true
@@ -399,7 +407,7 @@ export default {
   data() {
     return {
       myStyles: {
-        height: "100%"
+        height: "97%"
       },
       zoomControl: false,
       attributionControl: false,
@@ -451,7 +459,7 @@ export default {
   methods: {
     receiveStates() {
       this.axios
-        .get("http://019ce0f3.ngrok.io/api/v1/state-list")
+        .get("http://c76d0b00.ngrok.io/api/v1/state-list")
         .then(response => {
           this.gotStates = response.data.data;
         })
@@ -464,12 +472,15 @@ export default {
     },
     getGrowersDataState(selectedStateId) {
       this.axios
-        .get(`http://019ce0f3.ngrok.io/api/v1/state/${selectedStateId}`)
+        .get(`http://c76d0b00.ngrok.io/api/v1/state/${selectedStateId}`)
         .then(response => {
           this.growersDataState = response.data.data;
           this.state_name = response.data.state;
           this.datacollectionDoughnutMaleFemale = {
-            labels: ["Male", "Female"],
+            labels: [
+              "Male:  " + this.growersDataState.Male_count,
+              "Female:  " + this.growersDataState.Male_count
+            ],
             datasets: [
               {
                 label: "Data One",
@@ -494,13 +505,16 @@ export default {
             datasets: [
               {
                 label: "QR code generation Progress",
+                barThickness: 16,
+                maxBarThickness: 16,
+                minBarLength: 16,
                 backgroundColor: [
                   "#748adb",
-                  "#5267b3",
+                  "#5d6675",
                   "#a1aacc",
                   "#6c88f5",
-                  "#475eba",
-                  "#294fe6"
+                  "#b0ceff",
+                  "#00ffd0"
                 ],
                 pointBackgroundColor: "white",
                 borderWidth: 0,
@@ -543,7 +557,13 @@ export default {
           };
           this.datacollectionDoughnutCaste = {
             //
-            labels: ["ST", "SC", "OBC", "MOBC", "GEN"],
+            labels: [
+              "ST:  " + this.growersDataState.ST,
+              "SC:  " + this.growersDataState.SC,
+              "OBC:  " + this.growersDataState.OBC,
+              "MOBC:  " + this.growersDataState.MOBC,
+              "GEN:  " + this.growersDataState.GEN
+            ],
             datasets: [
               {
                 label: "Data One",
@@ -574,12 +594,16 @@ export default {
     factoryCatgState(selectedStateId) {
       this.axios
         .get(
-          `http://019ce0f3.ngrok.io/api/v1/state/factory-category/${selectedStateId}`
+          `http://c76d0b00.ngrok.io/api/v1/state/factory-category/${selectedStateId}`
         )
         .then(response => {
           this.factoryCtgState = response.data.data;
           this.datacollectionFactoryCatgPie = {
-            labels: ["BLF", "EF", "IT"],
+            labels: [
+              "BLF:  " + this.factoryCtgState.BLF,
+              "EF:  " + this.factoryCtgState.EF,
+              "IT:  " + this.factoryCtgState.IT
+            ],
             datasets: [
               {
                 label: "Data One",
@@ -608,17 +632,20 @@ export default {
       this.growersDataState = {};
 
       this.axios
-        .get(`http://019ce0f3.ngrok.io/api/v1/district/${selectedDistrictName}`)
+        .get(`http://c76d0b00.ngrok.io/api/v1/district/${selectedDistrictName}`)
         .then(response => {
           this.growersDataState = response.data.data;
           this.district_name = response.data.district;
           this.datacollectionDoughnutMaleFemale = {
-            labels: ["Male", "Female"],
+            labels: [
+              "Male:  " + this.growersDataState.Male_count,
+              "Female:  " + this.growersDataState.Female_count
+            ],
             datasets: [
               {
                 label: "Data One",
                 borderWidth: 0,
-                backgroundColor: ["#B83125", "#027585"],
+                backgroundColor: ["#464dee", "#0ddbb9"],
                 data: [
                   this.growersDataState.Male_count,
                   this.growersDataState.Female_count
@@ -638,14 +665,17 @@ export default {
             datasets: [
               {
                 label: "QR code generation Progress",
+                barThickness: 16,
+                maxBarThickness: 16,
+                minBarLength: 16,
                 borderWidth: 0,
                 backgroundColor: [
-                  "#2E9CA6",
-                  "#DC3F76",
-                  "#7446B9",
-                  "#C0C0C0",
-                  "#F96232",
-                  "#9FB328"
+                  "#748adb",
+                  "#5d6675",
+                  "#a1aacc",
+                  "#6c88f5",
+                  "#b0ceff",
+                  "#00ffd0"
                 ],
                 pointBackgroundColor: "white",
                 pointBorderColor: "#249EBF",
@@ -667,11 +697,11 @@ export default {
                 label: "Number of growers under certain area of Plantation",
                 borderWidth: 0,
                 backgroundColor: [
-                  "#4A759E",
-                  "#4A759E",
-                  "#4A759E",
-                  "#4A759E",
-                  "#4A759E"
+                  "#0ddbb9",
+                  "#0ddbb9",
+                  "#0ddbb9",
+                  "#0ddbb9",
+                  "#0ddbb9"
                 ],
                 pointBackgroundColor: "white",
                 pointBorderColor: "#249EBF",
@@ -686,16 +716,22 @@ export default {
             ]
           };
           this.datacollectionDoughnutCaste = {
-            labels: ["ST", "SC", "OBC", "MOBC", "GEN"],
+            labels: [
+              "ST:  " + this.growersDataState.ST,
+              "SC:  " + this.growersDataState.SC,
+              "OBC:  " + this.growersDataState.OBC,
+              "MOBC:  " + this.growersDataState.MOBC,
+              "GEN:  " + this.growersDataState.GEN
+            ],
             datasets: [
               {
                 label: "Data One",
                 borderWidth: 0,
                 backgroundColor: [
                   "#57c7d4",
-                  "#58d8a3",
-                  "#46c35f",
                   "#f6e84e",
+                  "#46c35f",
+                  "#f96868",
                   "#f2a654"
                 ],
                 data: [
@@ -717,17 +753,21 @@ export default {
       this.factoryCtgState = {};
       this.axios
         .get(
-          `http://019ce0f3.ngrok.io/api/v1/district/factory-category/${selectedDistrictName}`
+          `http://c76d0b00.ngrok.io/api/v1/district/factory-category/${selectedDistrictName}`
         )
         .then(response => {
           this.factoryCtgState = response.data.data;
           this.datacollectionFactoryCatgPie = {
-            labels: ["BLF", "EF", "IT"],
+            labels: [
+              "BLF:  " + this.factoryCtgState.BLF,
+              "EF:  " + this.factoryCtgState.EF,
+              "IT:  " + this.factoryCtgState.IT
+            ],
             datasets: [
               {
                 label: "Data One",
                 borderWidth: 0,
-                backgroundColor: ["#CD5C5C", "#a9c722", "#c77722"],
+                backgroundColor: ["#f6e84e", "#5e50f9", "#0ddbb9"],
                 data: [
                   this.factoryCtgState.BLF,
                   this.factoryCtgState.EF,

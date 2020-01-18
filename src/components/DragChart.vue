@@ -13,7 +13,7 @@
             :lat-lng="marker.position"
             @click="openFactoryModal(marker)"
           >
-            <l-tooltip>{{marker.factory_id}}</l-tooltip>
+            <l-tooltip>{{ marker.factory_id }}</l-tooltip>
             <l-popup :content="marker.factory_name"></l-popup>
           </l-marker>
           <l-polygon :lat-lngs="polygon.latlngs" :color="polygon.color"></l-polygon>
@@ -32,30 +32,58 @@
             <div>
               <h6>
                 Factory Id:
-                <span
-                  style="font-size:20px; padding-left:3px;"
-                >{{factoryDetailsInModal.factory_id}}</span>
+                <span style="font-size:20px; padding-left:3px;">
+                  {{
+                  factoryDetailsInModal.factory_id
+                  }}
+                </span>
               </h6>
               <h6>
                 Factory RC_No:
-                <span
-                  style="font-size:20px; padding-left:3px;"
-                >{{factoryDetailsInModal.factory_rc_number}}</span>
+                <span style="font-size:20px; padding-left:3px;">
+                  {{
+                  factoryDetailsInModal.factory_rc_number
+                  }}
+                </span>
               </h6>
               <h6>
                 Factory Name:
-                <span
-                  style="font-size:20px; padding-left:3px;"
-                >{{factoryDetailsInModal.factory_name}}</span>
+                <span style="font-size:20px; padding-left:3px;">
+                  {{
+                  factoryDetailsInModal.factory_name
+                  }}
+                </span>
               </h6>
               <h6>
                 State:
-                <span style="font-size:20px; padding-left:3px;">{{selectState.name}}</span>
+                <span style="font-size:20px; padding-left:3px;">
+                  {{
+                  selectState.name
+                  }}
+                </span>
               </h6>
-              <h6>
+              <h6 v-if="selectDistrict != null">
                 District:
-                <span style="font-size:20px; padding-left:3px;">{{selectDistrict}}</span>
+                <span style="font-size:20px; padding-left:3px;">
+                  {{
+                  selectDistrict
+                  }}
+                </span>
               </h6>
+            </div>
+            <hr />
+            <div>
+              <h6>
+                <u>Brokers Associated:</u>
+              </h6>
+              <span style="font-size: 20px;" class="d-block">1. Abc Broker</span>
+              <span style="font-size: 20px;" class="d-block">2. Defg Broker</span>
+              <span style="font-size: 20px;" class="d-block">3. Pqrs Broker</span>
+              <span style="font-size: 20px;" class="d-block">4. Mnoput Broker</span>
+              <span style="font-size: 20px;" class="d-block">1. Abc Broker</span>
+              <span style="font-size: 20px;" class="d-block">2. Defg Broker</span>
+              <span style="font-size: 20px;" class="d-block">3. Pqrs Broker</span>
+              <span style="font-size: 20px;" class="d-block">4. Mnoput Broker</span>
             </div>
           </b-modal>
         </div>
@@ -100,7 +128,10 @@
         <div class="row row2">
           <div class="col-md-6 full-height pr-0">
             <div class="card bg-dark text-white ht20">
-              <span class="px-4 pt-2" style="font-size: 20px;">Total Factories: {{factoryCtg.total}}</span>
+              <span
+                class="px-4 pt-2"
+                style="font-size: 20px;"
+              >Total Factories: {{ factoryCtg.total }}</span>
             </div>
             <div class="card bg-dark text-white pb-2 ht80">
               <piefactorycatg-chart
@@ -119,7 +150,7 @@
               </div>
               <div>
                 <h1 class="mt-2">
-                  {{factoryCtg.Installed_Capacity || 0}}
+                  {{ factoryCtg.Installed_Capacity || 0 }}
                   <span style="font-size:24px;">kg</span>
                 </h1>
               </div>
@@ -131,7 +162,7 @@
                 <h5>Registered with Chai-Sahyog</h5>
               </div>
               <div>
-                <h1 class="mt-2">{{factoryCtg.Registered_Factory}}</h1>
+                <h1 class="mt-2">{{ factoryCtg.Registered_Factory }}</h1>
               </div>
             </div>
           </div>
@@ -172,13 +203,17 @@ const optionspie = {
     render: "value",
     precision: 1
   },
-  showAllTooltips: true,
+  // tooltips: {
+  //   enabled: false
+  // },
+  // showAllTooltips: true,
   animation: {
     animateRotate: true,
     animateScale: true
   },
   legend: {
     // position: "right",
+    // display: false,
     labels: {
       // This more specific font property overrides the global property
       fontColor: "white"
@@ -264,7 +299,7 @@ export default {
   methods: {
     receiveStates() {
       this.axios
-        .get("http://019ce0f3.ngrok.io/api/v1/state-list")
+        .get("http://c76d0b00.ngrok.io/api/v1/state-list")
         .then(response => {
           this.gotStates = response.data.data;
         })
@@ -282,18 +317,22 @@ export default {
 
       this.axios
         .get(
-          `http://019ce0f3.ngrok.io/api/v1/state/factory-category/${selectedStateId}`
+          `http://c76d0b00.ngrok.io/api/v1/state/factory-category/${selectedStateId}`
         )
         .then(response => {
           this.factoryCtg = response.data.data;
 
           this.datacollectionFactoryCatgPie = {
-            labels: ["BLF", "EF", "IT"],
+            labels: [
+              "BLF:  " + this.factoryCtg.BLF,
+              "EF:  " + this.factoryCtg.EF,
+              "IT:  " + this.factoryCtg.IT
+            ],
             datasets: [
               {
                 borderWidth: 0,
                 label: "Data One",
-                backgroundColor: ["#CD5C5C", "#a9c722", "#c77722"],
+                backgroundColor: ["#f6e84e", "#5e50f9", "#0ddbb9"],
                 data: [
                   this.factoryCtg.BLF,
                   this.factoryCtg.EF,
@@ -309,7 +348,7 @@ export default {
     factoryLocnState(selectedStateId) {
       this.axios
         .get(
-          `http://019ce0f3.ngrok.io/api/v1/state/factory/location/${selectedStateId}`
+          `http://c76d0b00.ngrok.io/api/v1/state/factory/location/${selectedStateId}`
         )
         .then(response => {
           // this.markers = response.data.data.factoryloc;
@@ -344,17 +383,21 @@ export default {
       this.factoryCtg = {};
       this.axios
         .get(
-          `http://019ce0f3.ngrok.io/api/v1/district/factory-category/${selectedDistrictName}`
+          `http://c76d0b00.ngrok.io/api/v1/district/factory-category/${selectedDistrictName}`
         )
         .then(response => {
           this.factoryCtg = response.data.data;
           this.datacollectionFactoryCatgPie = {
-            labels: ["BLF", "EF", "IT"],
+            labels: [
+              "BLF:  " + this.factoryCtg.BLF,
+              "EF:  " + this.factoryCtg.EF,
+              "IT:  " + this.factoryCtg.IT
+            ],
             datasets: [
               {
                 label: "Data One",
                 borderWidth: 0,
-                backgroundColor: ["#CD5C5C", "#a9c722", "#c77722"],
+                backgroundColor: ["#f6e84e", "#5e50f9", "#0ddbb9"],
                 data: [
                   this.factoryCtg.BLF,
                   this.factoryCtg.EF,
@@ -369,7 +412,7 @@ export default {
     factoryLocn(selectedDistrictName) {
       this.axios
         .get(
-          `http://019ce0f3.ngrok.io/api/v1/district/factory/location/${selectedDistrictName}`
+          `http://c76d0b00.ngrok.io/api/v1/district/factory/location/${selectedDistrictName}`
         )
         .then(response => {
           // this.markers = response.data.data.factoryloc;

@@ -46,14 +46,18 @@
             </l-marker>
 
             <div v-for="(factoryGrower,index) in dataLocations.factories" :key="index">
-              <l-marker
+              <l-circle-marker
                 v-for="(grower,index) in factoryGrower.growers"
                 :key="index"
                 :lat-lng="grower.position"
+                :radius="circle.radius"
+                :color="circle.color"
+                :fillColor="circle.fillColor"
+                :fillOpacity="circle.fillOpacity"
               >
                 <l-tooltip>{{ grower.grower_id }}</l-tooltip>
                 <l-popup>{{ grower.grower_id }}</l-popup>
-              </l-marker>
+              </l-circle-marker>
             </div>
           </div>
 
@@ -63,21 +67,24 @@
               :key="index"
               :lat-lng="teaboardOffice.position"
             >
+              <l-icon :icon-size="dynamicSize" icon-url="/pin3.png"></l-icon>
               <l-tooltip>{{ teaboardOffice.office_id }}</l-tooltip>
               <l-popup>{{ teaboardOffice.office_id }}</l-popup>
             </l-marker>
           </div>
-
+          <!-- <div style="z-index: 99999">
+            <img src="../assets/logo.png" />
+          </div>-->
           <!-- <l-marker :lat-lng="grab.position" @click="drawLines(grab)"></l-marker> -->
           <l-polyline :lat-lngs="polyline.latlngs" :color="polyline.color"></l-polyline>
 
-          <l-circle-marker
+          <!-- <l-circle-marker
             :lat-lng="circle.center"
             :radius="circle.radius"
             :color="circle.color"
             :fillColor="circle.fillColor"
             :fillOpacity="circle.fillOpacity"
-          />
+          />-->
           <!-- other map components -->
         </l-map>
         <b-modal v-model="modalShow">Hello From Modal!</b-modal>
@@ -93,13 +100,25 @@
     <div class="row h10 px-4">
       <div class="col text-center my-auto mx-auto border-right">
         <button
+          v-if="showFactoryGrowerLocations"
+          type="button"
+          class="btn btn-light btn-lg btn-block"
+          @click="openFactoryGrowerLocations"
+        >Factories and Growers</button>
+        <button
+          v-else
           type="button"
           class="btn btn-outline-light btn-lg btn-block"
           @click="openFactoryGrowerLocations"
         >Factories and Growers</button>
       </div>
       <div class="col text-center my-auto mx-auto border-right" @click="openTeaboardLocations">
-        <button type="button" class="btn btn-outline-light btn-lg btn-block">Tea-board Office</button>
+        <button
+          v-if="showTeaboardLocation"
+          type="button"
+          class="btn btn-light btn-lg btn-block"
+        >Tea-board Office</button>
+        <button v-else type="button" class="btn btn-outline-light btn-lg btn-block">Tea-board Office</button>
       </div>
       <div class="col text-center my-auto mx-auto border-right">
         <button type="button" class="btn btn-outline-light btn-lg btn-block">BLF</button>
@@ -120,6 +139,7 @@ import {
   LPolyline,
   LTileLayer,
   LMarker,
+  LIcon,
   LCircleMarker,
   LPopup,
   LTooltip,
@@ -140,6 +160,7 @@ const options = {
 export default {
   data() {
     return {
+      iconSize: 32,
       showLines: false,
       showFactoryGrowerLocations: true,
       showTeaboardLocation: false,
@@ -174,9 +195,9 @@ export default {
       center: [28.6139, 77.209],
       circle: {
         center: [28.6136, 77.207],
-        radius: 5,
-        color: "#26291a",
-        fillColor: "#26291a",
+        radius: 4,
+        color: "#ff5100",
+        fillColor: "#ff5100",
         fillOpacity: 1
       },
       dataLocations: {
@@ -261,6 +282,7 @@ export default {
   components: {
     LMap,
     LMarker,
+    LIcon,
     LPolyline,
     LCircleMarker,
     LControlLayers,
@@ -268,6 +290,11 @@ export default {
     LPopup,
     LTooltip,
     LControlPolylineMeasure
+  },
+  computed: {
+    dynamicSize() {
+      return [this.iconSize, this.iconSize * 1.15];
+    }
   },
   methods: {
     openFactoryGrowerLocations() {
