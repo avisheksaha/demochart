@@ -1,7 +1,7 @@
 import Vue from "vue";
 import VueRouter from "vue-router";
 
-import Dashboard from "@/components/Dashboard";
+// import Dashboard from "@/components/Dashboard";
 import ArticlePage from "@/components/ArticlePage";
 import YourQuestions from "@/components/YourQuestions";
 import RandomChart from "@/components/RandomChart";
@@ -17,7 +17,7 @@ export default new VueRouter({
   routes: [
     {
       path: "/",
-      component: Dashboard
+      component: RandomChart
     },
     {
       path: "/article-page/:id",

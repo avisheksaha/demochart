@@ -459,7 +459,7 @@ export default {
   methods: {
     receiveStates() {
       this.axios
-        .get("http://c76d0b00.ngrok.io/api/v1/state-list")
+        .get("https://teaboardapi.sumato.tech/api/v1/state-list")
         .then(response => {
           this.gotStates = response.data.data;
         })
@@ -472,7 +472,7 @@ export default {
     },
     getGrowersDataState(selectedStateId) {
       this.axios
-        .get(`http://c76d0b00.ngrok.io/api/v1/state/${selectedStateId}`)
+        .get(`https://teaboardapi.sumato.tech/api/v1/state/${selectedStateId}`)
         .then(response => {
           this.growersDataState = response.data.data;
           this.state_name = response.data.state;
@@ -594,7 +594,7 @@ export default {
     factoryCatgState(selectedStateId) {
       this.axios
         .get(
-          `http://c76d0b00.ngrok.io/api/v1/state/factory-category/${selectedStateId}`
+          `https://teaboardapi.sumato.tech/api/v1/state/factory-category/${selectedStateId}`
         )
         .then(response => {
           this.factoryCtgState = response.data.data;
@@ -632,7 +632,9 @@ export default {
       this.growersDataState = {};
 
       this.axios
-        .get(`http://c76d0b00.ngrok.io/api/v1/district/${selectedDistrictName}`)
+        .get(
+          `https://teaboardapi.sumato.tech/api/v1/district/${selectedDistrictName}`
+        )
         .then(response => {
           this.growersDataState = response.data.data;
           this.district_name = response.data.district;
@@ -753,7 +755,7 @@ export default {
       this.factoryCtgState = {};
       this.axios
         .get(
-          `http://c76d0b00.ngrok.io/api/v1/district/factory-category/${selectedDistrictName}`
+          `https://teaboardapi.sumato.tech/api/v1/district/factory-category/${selectedDistrictName}`
         )
         .then(response => {
           this.factoryCtgState = response.data.data;

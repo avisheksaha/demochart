@@ -299,7 +299,7 @@ export default {
   methods: {
     receiveStates() {
       this.axios
-        .get("http://c76d0b00.ngrok.io/api/v1/state-list")
+        .get("https://teaboardapi.sumato.tech/api/v1/state-list")
         .then(response => {
           this.gotStates = response.data.data;
         })
@@ -317,7 +317,7 @@ export default {
 
       this.axios
         .get(
-          `http://c76d0b00.ngrok.io/api/v1/state/factory-category/${selectedStateId}`
+          `https://teaboardapi.sumato.tech/api/v1/state/factory-category/${selectedStateId}`
         )
         .then(response => {
           this.factoryCtg = response.data.data;
@@ -348,7 +348,7 @@ export default {
     factoryLocnState(selectedStateId) {
       this.axios
         .get(
-          `http://c76d0b00.ngrok.io/api/v1/state/factory/location/${selectedStateId}`
+          `https://teaboardapi.sumato.tech/api/v1/state/factory/location/${selectedStateId}`
         )
         .then(response => {
           // this.markers = response.data.data.factoryloc;
@@ -383,7 +383,7 @@ export default {
       this.factoryCtg = {};
       this.axios
         .get(
-          `http://c76d0b00.ngrok.io/api/v1/district/factory-category/${selectedDistrictName}`
+          `https://teaboardapi.sumato.tech/api/v1/district/factory-category/${selectedDistrictName}`
         )
         .then(response => {
           this.factoryCtg = response.data.data;
@@ -412,7 +412,7 @@ export default {
     factoryLocn(selectedDistrictName) {
       this.axios
         .get(
-          `http://c76d0b00.ngrok.io/api/v1/district/factory/location/${selectedDistrictName}`
+          `https://teaboardapi.sumato.tech/api/v1/district/factory/location/${selectedDistrictName}`
         )
         .then(response => {
           // this.markers = response.data.data.factoryloc;
