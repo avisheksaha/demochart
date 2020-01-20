@@ -49,7 +49,7 @@
 </template>
 
 <script>
-import FileInput from "../tuis/FileInput.vue";
+// import FileInput from "../tuis/FileInput.vue";
 
 export default {
   props: {
