@@ -241,7 +241,7 @@ export default {
       attribution:
         '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors',
       zoom: 8,
-      center: [28.6139, 77.209],
+      center: [26.1433, 91.7898],
       markers: [],
       polygon: {
         latlngs: [
