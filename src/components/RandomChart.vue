@@ -1,8 +1,21 @@
 <template>
   <div
-    class="container-fluid full-height overflow-hidden"
+    class="container-fluid full-height overflow-hidden position-relative"
     style="padding-left:8px !important; padding-right:8px !important;"
   >
+    <div
+      class="position-absolute text-center d-flex align-items-center justify-content-center h-100 w-100"
+      v-if="loadingBtn"
+      style="z-index:10;background: rgba(0,0,0,0.8);"
+    >
+      <div
+        class="spinner-border text-light"
+        style="width: 5rem; height: 5rem;z-index:9;"
+        role="status"
+      >
+        <span class="sr-only">Loading...</span>
+      </div>
+    </div>
     <!-- {{gotStates}} -->
     <div class="row row1">
       <div class="col-md-4">
@@ -40,13 +53,7 @@
         </select>
       </div>
     </div>
-    <div class="row">
-      <div v-if="loadingBtn">
-        <div class="spinner-border text-light" role="status">
-          <span class="sr-only">Loading...</span>
-        </div>
-      </div>
-    </div>
+
     <div class="row row2">
       <div class="col-md-4 pr-0 full-height">
         <div class="row ht20">
@@ -466,9 +473,11 @@ export default {
   },
   methods: {
     receiveStates() {
+      this.loadingBtn = true;
       this.axios
         .get("https://teaboardapi.sumato.tech/api/v1/state-list")
         .then(response => {
+          this.loadingBtn = false;
           this.gotStates = response.data.data;
         })
         .catch();
@@ -640,12 +649,13 @@ export default {
     },
     getGrowersDataDistrict(selectedDistrictName) {
       this.growersDataState = {};
-
+      this.loadingBtn = true;
       this.axios
         .get(
           `https://teaboardapi.sumato.tech/api/v1/district/${selectedDistrictName}`
         )
         .then(response => {
+          this.loadingBtn = false;
           this.growersDataState = response.data.data;
           this.district_name = response.data.district;
           this.datacollectionDoughnutMaleFemale = {
