@@ -40,6 +40,13 @@
         </select>
       </div>
     </div>
+    <div class="row">
+      <div v-if="loadingBtn">
+        <div class="spinner-border text-light" role="status">
+          <span class="sr-only">Loading...</span>
+        </div>
+      </div>
+    </div>
     <div class="row row2">
       <div class="col-md-4 pr-0 full-height">
         <div class="row ht20">
@@ -406,6 +413,7 @@ export default {
   },
   data() {
     return {
+      loadingBtn: false,
       myStyles: {
         height: "97%"
       },
@@ -471,9 +479,11 @@ export default {
       this.factoryCatgState(selectedStateId);
     },
     getGrowersDataState(selectedStateId) {
+      this.loadingBtn = true;
       this.axios
         .get(`https://teaboardapi.sumato.tech/api/v1/state/${selectedStateId}`)
         .then(response => {
+          this.loadingBtn = false;
           this.growersDataState = response.data.data;
           this.state_name = response.data.state;
           this.datacollectionDoughnutMaleFemale = {

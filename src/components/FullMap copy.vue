@@ -108,32 +108,82 @@
             layer-type="base"
           />
 
-          <div v-if="toggleFactoryLocations">
-            <div v-for="(factoryLoc,index) in factoryLocations" :key="index">
-              <div v-if="factoryLoc.type === 'blf'">
-                <l-marker :lat-lng="factoryLoc.position" @click="toggledrawLines(factoryLoc)">
-                  <l-icon :icon-size="dynamicSize" icon-url="/blfMarker.png"></l-icon>
-                  <l-tooltip>{{ factoryLoc.factory_name }}</l-tooltip>
-                  <l-popup>{{ factoryLoc.factory_name }}</l-popup>
-                </l-marker>
-              </div>
-              <div v-if="factoryLoc.type === 'ef'">
-                <l-marker :lat-lng="factoryLoc.position" @click="toggledrawLines(factoryLoc)">
-                  <l-icon :icon-size="dynamicSize" icon-url="/efMarker.png"></l-icon>
-                  <l-tooltip>{{ factoryLoc.factory_name }}</l-tooltip>
-                  <l-popup>{{ factoryLoc.factory_name }}</l-popup>
-                </l-marker>
-              </div>
-              <div v-if="factoryLoc.type === 'it'">
-                <l-marker :lat-lng="factoryLoc.position" @click="toggledrawLines(factoryLoc)">
-                  <l-icon :icon-size="dynamicSize" icon-url="/pin3.png"></l-icon>
-                  <l-tooltip>{{ factoryLoc.factory_name }}</l-tooltip>
-                  <l-popup>{{ factoryLoc.factory_name }}</l-popup>
-                </l-marker>
-              </div>
+          <!-- :token="token" -->
+
+          <!-- <l-marker
+                                v-for="marker in markers"
+                                :key="marker.id"
+                                :lat-lng="marker.position"
+                                :backgroundColor="green"
+                                :fillColor="circle.fillColor"
+                                @click="modalShow = !modalShow"
+          >-->
+
+          <!-- <div v-if="showFactoryGrowerLocations">
+            <l-marker
+              v-for="factory in dataLocations.factories"
+              :key="factory.factory_id"
+              :lat-lng="factory.position"
+              @click="toggledrawLines(factory)"
+            >
+              <l-tooltip>{{ factory.factory_name }}</l-tooltip>
+              <l-popup>{{ factory.factory_id }}</l-popup>
+            </l-marker>
+
+            <div v-for="(factoryGrower,index) in dataLocations.factories" :key="index">
+              <l-circle-marker
+                v-for="(grower,index) in factoryGrower.growers"
+                :key="index"
+                :lat-lng="grower.position"
+                :radius="circle.radius"
+                :color="circle.color"
+                :fillColor="circle.fillColor"
+                :fillOpacity="circle.fillOpacity"
+                @click="togglegrowersDataSidebar(grower)"
+              >
+                <l-tooltip>{{ grower.grower_name }}</l-tooltip>
+                <l-popup>{{ grower.grower_id }}</l-popup>
+              </l-circle-marker>
             </div>
+            <l-polyline :lat-lngs="polyline.latlngs" :color="polyline.color"></l-polyline>
+          </div>-->
+
+          <div v-if="toggleFactoryLocations">
+            <l-marker
+              v-for="(factoryLoc,index) in factoryLocations.factoryLocations"
+              :key="index"
+              :lat-lng="factoryLoc.position"
+              @click="toggledrawLines(factoryLoc)"
+            >
+              <div v-if="showLines">
+                <l-circle-marker
+                  v-for="(grower,index) in factoryMapGrowerLocations.growers"
+                  :key="index"
+                  :lat-lng="grower.position"
+                  :radius="circle.radius"
+                  :color="circle.color"
+                  :fillColor="circle.fillColor"
+                  :fillOpacity="circle.fillOpacity"
+                >
+                  <l-tooltip>{{ grower.grower_name }}</l-tooltip>
+                  <!-- <l-popup>{{ grower.grower_id }}</l-popup> -->
+                </l-circle-marker>
+              </div>
+              <l-tooltip>{{ factoryLoc.factory_name }}</l-tooltip>
+              <l-popup>{{ factoryLoc.factory_name }}</l-popup>
+            </l-marker>
+            <l-polyline :lat-lngs="polyline.latlngs" :color="polyline.color"></l-polyline>
           </div>
-          <div v-if="toggleFactMapGrower">
+
+          <div v-if="toggleFactoryMapGrowerLocations">
+            <l-marker
+              :lat-lng="factoryMapGrowerLocations.position"
+              @click="toggledrawLines(factoryMapGrowerLocations.factory_id)"
+            >
+              <l-tooltip>{{ factoryMapGrowerLocations.factory_name }}</l-tooltip>
+              <!-- <l-popup>{{ factory.factory_id }}</l-popup> -->
+            </l-marker>
+
             <l-circle-marker
               v-for="(grower,index) in factoryMapGrowerLocations.growers"
               :key="index"
@@ -142,6 +192,7 @@
               :color="circle.color"
               :fillColor="circle.fillColor"
               :fillOpacity="circle.fillOpacity"
+              @click="togglegrowersDataSidebar(grower)"
             >
               <l-tooltip>{{ grower.grower_name }}</l-tooltip>
               <!-- <l-popup>{{ grower.grower_id }}</l-popup> -->
@@ -177,37 +228,37 @@
             </l-marker>
           </div>
           <div v-if="toggleBlfLocations">
-            <div v-for="(blfLoc,index) in factoryLocations" :key="index">
-              <div v-if="blfLoc.type==='blf'">
-                <l-marker :lat-lng="blfLoc.position">
-                  <l-icon :icon-size="dynamicSize" icon-url="/blfMarker.png"></l-icon>
-                  <l-tooltip>{{ blfLoc.factory_name }}</l-tooltip>
-                  <l-popup>{{ blfLoc.factory_name }}</l-popup>
-                </l-marker>
-              </div>
-            </div>
+            <l-marker
+              v-for="(blfLoc,index) in plantationLocations.blf"
+              :key="index"
+              :lat-lng="blfLoc.position"
+            >
+              <l-icon :icon-size="dynamicSize" icon-url="/blfMarker.png"></l-icon>
+              <l-tooltip>{{ blfLoc.factory_id }}</l-tooltip>
+              <l-popup>{{ blfLoc.factory_id }}</l-popup>
+            </l-marker>
           </div>
           <div v-if="toggleEfLocations">
-            <div v-for="(efLoc,index) in factoryLocations" :key="index">
-              <div v-if="efLoc.type==='ef'">
-                <l-marker :lat-lng="efLoc.position">
-                  <l-icon :icon-size="dynamicSize" icon-url="/efMarker.png"></l-icon>
-                  <l-tooltip>{{ efLoc.factory_name }}</l-tooltip>
-                  <l-popup>{{ efLoc.factory_name }}</l-popup>
-                </l-marker>
-              </div>
-            </div>
+            <l-marker
+              v-for="(efLoc,index) in plantationLocations.ef"
+              :key="index"
+              :lat-lng="efLoc.position"
+            >
+              <l-icon :icon-size="dynamicSize" icon-url="/efMarker.png"></l-icon>
+              <l-tooltip>{{ efLoc.factory_id }}</l-tooltip>
+              <l-popup>{{ efLoc.factory_id }}</l-popup>
+            </l-marker>
           </div>
           <div v-if="toggleItLocations">
-            <div v-for="(itLoc,index) in factoryLocations" :key="index">
-              <div v-if="itLoc.type==='it'">
-                <l-marker :lat-lng="itLoc.position">
-                  <l-icon :icon-size="dynamicSize" icon-url="/pin3.png"></l-icon>
-                  <l-tooltip>{{ itLoc.factory_name }}</l-tooltip>
-                  <l-popup>{{ itLoc.factory_name }}</l-popup>
-                </l-marker>
-              </div>
-            </div>
+            <l-marker
+              v-for="(itLoc,index) in plantationLocations.it"
+              :key="index"
+              :lat-lng="itLoc.position"
+            >
+              <l-icon :icon-size="dynamicSize" icon-url="/pin3.png"></l-icon>
+              <l-tooltip>{{ itLoc.factory_id }}</l-tooltip>
+              <l-popup>{{ itLoc.factory_id }}</l-popup>
+            </l-marker>
           </div>
           <!-- <div style="z-index: 99999">
             <img src="../assets/logo.png" />
@@ -249,8 +300,21 @@
           @click="openFactoryLocations"
         >Factories</button>
       </div>
-
-      <!-- <div class="col text-center my-auto mx-auto border-right">
+      <div class="col text-center my-auto mx-auto border-right">
+        <button
+          v-if="showFactoryGrowerLocations"
+          type="button"
+          class="btn btn-light btn-lg btn-block"
+          @click="openFactoryGrowerLocations"
+        >FandG</button>
+        <button
+          v-else
+          type="button"
+          class="btn btn-outline-light btn-lg btn-block"
+          @click="openFactoryGrowerLocations"
+        >FandG</button>
+      </div>
+      <div class="col text-center my-auto mx-auto border-right">
         <button
           v-if="toggleGrowerLocations"
           type="button"
@@ -263,7 +327,7 @@
           class="btn btn-outline-light btn-lg btn-block"
           @click="openGrowerLocations"
         >Growers</button>
-      </div>-->
+      </div>
       <div class="col text-center my-auto mx-auto border-right" @click="openTeaboardLocations">
         <button
           v-if="showTeaboardLocation"
@@ -345,7 +409,6 @@ const options = {
 export default {
   data() {
     return {
-      toggleFactMapGrower: false,
       toggleFactoryMapGrowerLocations: false,
       toggleFactoryLocations: false,
       toggleGrowerLocations: false,
@@ -399,59 +462,49 @@ export default {
         fillColor: "#ff5100",
         fillOpacity: 1
       },
-      factoryLocations: [
-        {
-          factory_id: 101,
-          type: "blf",
-          factory_name: "Arena Tea Factory",
-          position: [27.520451064122113, 95.24322509765624]
-        },
-        {
-          factory_id: 102,
-          type: "it",
-          factory_name: "ITPlant1 Tea Factory",
-          position: [27.4778163898063, 95.31600952148438]
-        },
-        {
-          factory_id: 103,
-          type: "it",
-          factory_name: "ITPlant2 Tea Factory",
-          position: [27.498, 95.34]
-        },
-        {
-          factory_id: 104,
-          type: "ef",
-          factory_name: "MMMM Tea Factory",
-          position: [27.55, 95.1678]
-        }
-      ],
-      growersLocations: [
-        {
-          grower_id: 1,
-          grower_name: "First Grower",
-          position: [27.36201054924028, 94.82025146484375]
-        },
-        {
-          grower_id: 2,
-          grower_name: "Second Grower",
-          position: [27.36810861957394, 94.88616943359375]
-        },
-        {
-          grower_id: 3,
-          grower_name: "Third Grower",
-          position: [27.409566585950014, 94.95208740234375]
-        },
-        {
-          grower_id: 4,
-          grower_name: "Fourth Grower",
-          position: [27.424195097553206, 94.85458374023438]
-        },
-        {
-          grower_id: 5,
-          grower_name: "Fifth Grower",
-          position: [27.36810861957394, 94.94247436523438]
-        }
-      ],
+      factoryLocations: {
+        factoryLocations: [
+          {
+            factory_id: 101,
+            factory_name: "Arena Tea Factory",
+            position: [27.547241546253268, 95.23361206054688]
+          },
+          {
+            factory_id: 102,
+            factory_name: "MMMM Tea Factory",
+            position: [27.531411596114037, 95.36544799804688]
+          }
+        ]
+      },
+      growersLocations: {
+        growersLocations: [
+          {
+            grower_id: 1,
+            grower_name: "First Grower",
+            position: [27.36201054924028, 94.82025146484375]
+          },
+          {
+            grower_id: 2,
+            grower_name: "Second Grower",
+            position: [27.36810861957394, 94.88616943359375]
+          },
+          {
+            grower_id: 3,
+            grower_name: "Third Grower",
+            position: [27.409566585950014, 94.95208740234375]
+          },
+          {
+            grower_id: 4,
+            grower_name: "Fourth Grower",
+            position: [27.424195097553206, 94.85458374023438]
+          },
+          {
+            grower_id: 5,
+            grower_name: "Fifth Grower",
+            position: [27.36810861957394, 94.94247436523438]
+          }
+        ]
+      },
       plantationLocations: {
         teaboardOffices: [
           {
@@ -512,7 +565,7 @@ export default {
       factoryMapGrowerLocations: {
         factory_id: 101,
         factory_name: "Arena Tea Factory",
-        position: [27.520451064122113, 95.24322509765624],
+        position: [28.66, 77.23],
         growers: [
           {
             grower_id: 1,
@@ -528,6 +581,81 @@ export default {
             grower_id: 3,
             grower_name: "Third Grower",
             position: [27.409566585950014, 94.95208740234375]
+          }
+        ]
+      },
+      dataLocations: {
+        factories: [
+          {
+            factory_id: 101,
+            factory_name: "Arena Tea Factory",
+            position: [28.66, 77.23],
+            growers: [
+              {
+                grower_id: 1,
+                grower_name: "First Grower",
+                position: [28.6136, 77.23]
+              },
+              {
+                grower_id: 2,
+                grower_name: "Second Grower",
+                position: [28.62, 77.21]
+              },
+              {
+                grower_id: 3,
+                grower_name: "Third Grower",
+                position: [28.64, 77.228]
+              },
+              {
+                grower_id: 4,
+                grower_name: "Fourth Grower",
+                position: [28.618, 77.224]
+              },
+              {
+                grower_id: 5,
+                grower_name: "Fifth Grower",
+                position: [28.624, 77.218]
+              }
+            ]
+          },
+          {
+            factory_id: 102,
+            factory_name: "Hamilton Tea Factory",
+            position: [28.67, 77.24],
+            growers: [
+              {
+                grower_id: 9,
+                grower_name: "Ninth Grower",
+                position: [28.628, 77.25]
+              },
+              {
+                grower_id: 10,
+                grower_name: "Tenth Grower",
+                position: [28.632, 77.29]
+              }
+            ]
+          }
+        ],
+        teaboardOffices: [
+          {
+            office_id: "O-441",
+            position: [28.63, 77.05]
+          },
+          {
+            office_id: "0-442",
+            position: [28.6345, 77.09]
+          },
+          {
+            office_id: "0-443",
+            position: [28.6998, 77.1]
+          },
+          {
+            office_id: "0-443",
+            position: [28.6789, 77.12124]
+          },
+          {
+            grower_id: 5,
+            position: [28.624, 77.218]
           }
         ]
       },
@@ -593,59 +721,18 @@ export default {
         .catch();
     },
     openFactoryLocations() {
-      if (
-        this.toggleBlfLocations == true ||
-        this.toggleEfLocations == true ||
-        this.toggleItLocations == true
-      ) {
-        this.toggleBlfLocations = false;
-        this.toggleEfLocations = false;
-        this.toggleItLocations = false;
-      }
       this.toggleFactoryLocations = !this.toggleFactoryLocations;
-      if (this.toggleFactoryLocations == false) {
-        this.showLines = false;
-        this.toggleFactMapGrower = false;
-        console.log("xxxx");
-      }
     },
     openGrowerLocations() {
       this.toggleGrowerLocations = !this.toggleGrowerLocations;
     },
     openBlfLocations() {
-      if (
-        this.toggleFactoryLocations == true ||
-        this.toggleEfLocations == true ||
-        this.toggleItLocations == true
-      ) {
-        this.toggleFactoryLocations = false;
-        this.toggleEfLocations = false;
-        this.toggleItLocations = false;
-      }
       this.toggleBlfLocations = !this.toggleBlfLocations;
     },
     openEfLocations() {
-      if (
-        this.toggleFactoryLocations == true ||
-        this.toggleBlfLocations == true ||
-        this.toggleItLocations == true
-      ) {
-        this.toggleFactoryLocations = false;
-        this.toggleBlfLocations = false;
-        this.toggleItLocations = false;
-      }
       this.toggleEfLocations = !this.toggleEfLocations;
     },
     openItLocations() {
-      if (
-        this.toggleFactoryLocations == true ||
-        this.toggleBlfLocations == true ||
-        this.toggleEfLocations == true
-      ) {
-        this.toggleFactoryLocations = false;
-        this.toggleBlfLocations = false;
-        this.toggleEfLocations = false;
-      }
       this.toggleItLocations = !this.toggleItLocations;
     },
 
@@ -656,8 +743,6 @@ export default {
       //hit api to get response of factories associated with growers and store in factoryMapGrowerLocations
       // this.toggleDataInSidebar = false;
       this.showLines = !this.showLines;
-      this.toggleGrowerLocations = true;
-      this.toggleFactMapGrower = !this.toggleFactMapGrower;
       // this.drawLines(factory);
       this.drawLines();
       this.rightSidebarFactories = !this.rightSidebarFactories;
@@ -665,18 +750,19 @@ export default {
     },
     drawLines() {
       if (this.showLines == true) {
-        var factLocn = this.factoryMapGrowerLocations;
-        var factGrowersLocn = this.factoryMapGrowerLocations.growers;
+        var fact = this.factoryMapGrowerLocations;
+        console.log(fact);
         // var fact = factory;
         // console.log(fact, "kkkk");
         var latlngsff = Array();
-        factGrowersLocn.forEach(element => {
-          latlngsff.push(factLocn.position);
+        fact.growers.forEach(element => {
+          latlngsff.push(fact.position);
           latlngsff.push(element.position);
           this.polyline.latlngs = latlngsff;
+          console.log(this.polyline.latlngs);
         });
       }
-      if (this.showLines == false && this.toggleFactMapGrower == false) {
+      if (this.showLines == false) {
         console.log(false);
         this.polyline.latlngs = [];
         // console.log(polyline.latlngs);
