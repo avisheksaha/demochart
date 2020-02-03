@@ -13,13 +13,13 @@
         style="width: 5rem; height: 5rem;z-index:9;"
         role="status"
       >
-        <span class="sr-only">Loading...</span>
+        <span class="sr-only text-white">Loading...</span>
       </div>
     </div>
     <!-- {{gotStates}} -->
-    <div class="row row1">
+    <div class="row row1 mt-2">
       <div class="col-md-4">
-        <label class="my-1 mr-2 text-white" for="inlineFormCustomSelectPref">Select State</label>
+        <!-- <label class="my-1 mr-2 text-white" for="inlineFormCustomSelectPref">Select State</label> -->
         <div v-if="gotStates.length > 0">
           <select
             class="custom-select my-1 mr-sm-2"
@@ -36,21 +36,58 @@
           </select>
         </div>
       </div>
-      <div class="col-md-4" v-if="selectState">
-        <label class="my-1 mr-2 text-white" for="inlineFormCustomSelectPref">Select Districts</label>
-        <select
-          class="custom-select my-1 mr-sm-2"
-          v-model="selectDistrict"
-          @change="districtSelected(selectDistrict)"
-          id="inlineFormCustomSelectPref"
-        >
-          <option value="null">Select a district</option>
-          <option
-            v-for="(district, index) in selectState.districts"
-            :key="index"
-            :value="district"
-          >{{ district }}</option>
-        </select>
+      <div class="col-md-4">
+        <div v-if="selectState">
+          <!-- <label class="my-1 mr-2 text-white" for="inlineFormCustomSelectPref">Select Districts</label> -->
+          <select
+            class="custom-select my-1 mr-sm-2"
+            v-model="selectDistrict"
+            @change="districtSelected(selectDistrict)"
+            id="inlineFormCustomSelectPref"
+          >
+            <option value="null">Select a district</option>
+            <option
+              v-for="(district, index) in selectState.districts"
+              :key="index"
+              :value="district"
+            >{{ district }}</option>
+          </select>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="text-right">
+          <b-dropdown
+            id="dropdown-1"
+            size="lg"
+            toggle-class="text-decoration-none"
+            no-caret
+            class
+            variant="outline-info"
+          >
+            <template v-slot:button-content>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="26"
+                height="26"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                class="feather feather-settings"
+              >
+                <circle cx="12" cy="12" r="3" />
+                <path
+                  d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"
+                />
+              </svg>
+            </template>
+
+            <b-dropdown-item href="/dragchart" target="_blank">Factory details dashboard</b-dropdown-item>
+            <b-dropdown-item href="/fullmap" target="_blank">Factory & Growers Location</b-dropdown-item>
+          </b-dropdown>
+        </div>
       </div>
     </div>
 
@@ -62,7 +99,7 @@
               class="card bg-dark full-height text-white d-flex justify-content-center align-items-center"
             >
               <h6>Total number of Small Growers</h6>
-              <h3 style="color:#7eff47;">{{ this.growersDataState.Grower_count }}</h3>
+              <h3 style="color:#7eff47;">{{ this.growersDataState.Grower_count || 0}}</h3>
             </div>
           </div>
           <div class="col-md-6 full-height" style="padding-left:5px !important;">
@@ -70,7 +107,7 @@
               class="card bg-dark full-height text-white d-flex justify-content-center align-items-center"
             >
               <h6>Total area under plantation</h6>
-              <h4 style="color:#7eff47;">{{ this.growersDataState.total_plantation }}</h4>
+              <h4 style="color:#7eff47;">{{ this.growersDataState.total_plantation || 0}}</h4>
             </div>
           </div>
         </div>
@@ -96,7 +133,10 @@
               class="card bg-dark full-height text-white d-flex justify-content-center align-items-center"
             >
               <h5 class="titleCard">Total Installed Capacity</h5>
-              <h4 class="cardValue" style="color:#7eff47;">{{ factoryCtgState.Installed_Capacity }}</h4>
+              <h4
+                class="cardValue"
+                style="color:#7eff47;"
+              >{{ factoryCtgState.Installed_Capacity || 0}}</h4>
             </div>
           </div>
           <div class="col-md-6 full-height" style="padding-left:5px !important;">
@@ -824,11 +864,11 @@ export default {
   margin: 150px auto;
 }
 .row1 {
-  height: 10%;
+  height: 6%;
 }
 .row2 {
   margin-bottom: 4px;
-  height: 54%;
+  height: 58%;
 }
 .row3 {
   height: 34%;

@@ -4,6 +4,20 @@
     style="padding-left: 0px !important; padding-right: 0px !important;"
   >
     <div
+      class="position-absolute text-center d-flex align-items-center justify-content-center h-100 w-100"
+      v-if="loadingBtn"
+      style="z-index:10;background: rgba(0,0,0,0.8);"
+    >
+      <div
+        class="spinner-border text-light"
+        style="width: 5rem; height: 5rem;z-index:9;"
+        role="status"
+      >
+        <span class="sr-only text-white">Loading...</span>
+      </div>
+    </div>
+
+    <div
       v-if="rightSidebarFactories"
       class="position-absolute"
       style="width: 350px; right: 0; bottom:0; top:0; height: 100%; z-index: 999;"
@@ -126,7 +140,7 @@
               </div>
               <div v-if="factoryLoc.type === 'it'">
                 <l-marker :lat-lng="factoryLoc.position" @click="toggledrawLines(factoryLoc)">
-                  <l-icon :icon-size="dynamicSize" icon-url="/pin3.png"></l-icon>
+                  <l-icon :icon-size="dynamicSize" icon-url="/itMarker.png"></l-icon>
                   <l-tooltip>{{ factoryLoc.factory_name }}</l-tooltip>
                   <l-popup>{{ factoryLoc.factory_name }}</l-popup>
                 </l-marker>
@@ -159,7 +173,7 @@
               :fillColor="circle.fillColor"
               :fillOpacity="circle.fillOpacity"
             >
-              <l-icon :icon-size="dynamicSize" icon-url="/pin3.png"></l-icon>
+              <l-icon :icon-size="dynamicSize" icon-url="/itMarker.png"></l-icon>
               <l-tooltip>{{ growerLoc.grower_id }}</l-tooltip>
               <l-popup>{{ growerLoc.grower_id }}</l-popup>
             </l-circle-marker>
@@ -171,7 +185,7 @@
               :key="index"
               :lat-lng="teaboardOffice.position"
             >
-              <l-icon :icon-size="dynamicSize" icon-url="/pin3.png"></l-icon>
+              <l-icon :icon-size="dynamicSize" icon-url="/teaOfficeMarker.png"></l-icon>
               <l-tooltip>{{ teaboardOffice.office_id }}</l-tooltip>
               <l-popup>{{ teaboardOffice.office_id }}</l-popup>
             </l-marker>
@@ -202,7 +216,7 @@
             <div v-for="(itLoc,index) in factoryLocations" :key="index">
               <div v-if="itLoc.type==='it'">
                 <l-marker :lat-lng="itLoc.position">
-                  <l-icon :icon-size="dynamicSize" icon-url="/pin3.png"></l-icon>
+                  <l-icon :icon-size="dynamicSize" icon-url="/itMarker.png"></l-icon>
                   <l-tooltip>{{ itLoc.factory_name }}</l-tooltip>
                   <l-popup>{{ itLoc.factory_name }}</l-popup>
                 </l-marker>
@@ -241,13 +255,13 @@
           type="button"
           class="btn btn-light btn-lg btn-block"
           @click="openFactoryLocations"
-        >Factories</button>
+        >Factories & Growers</button>
         <button
           v-else
           type="button"
           class="btn btn-outline-light btn-lg btn-block"
           @click="openFactoryLocations"
-        >Factories</button>
+        >Factories & Growers</button>
       </div>
 
       <!-- <div class="col text-center my-auto mx-auto border-right">
@@ -265,12 +279,18 @@
         >Growers</button>
       </div>-->
       <div class="col text-center my-auto mx-auto border-right" @click="openTeaboardLocations">
-        <button
-          v-if="showTeaboardLocation"
-          type="button"
-          class="btn btn-light btn-lg btn-block"
-        >Tea-board Office</button>
-        <button v-else type="button" class="btn btn-outline-light btn-lg btn-block">Tea-board Office</button>
+        <button v-if="showTeaboardLocation" type="button" class="btn btn-light btn-lg btn-block">
+          <span>Tea-board Office</span>
+          <span class="pl-2">
+            <img src="/teaOfficeMarker.png" width="26" height="26" />
+          </span>
+        </button>
+        <button v-else type="button" class="btn btn-outline-light btn-lg btn-block">
+          <span>Tea-board Office</span>
+          <span class="pl-2">
+            <img src="/teaOfficeMarker.png" width="26" height="26" />
+          </span>
+        </button>
       </div>
       <div class="col text-center my-auto mx-auto border-right">
         <button
@@ -278,13 +298,23 @@
           type="button"
           class="btn btn-light btn-lg btn-block"
           @click="openBlfLocations"
-        >BLF</button>
+        >
+          <span>BLF</span>
+          <span class="pl-2">
+            <img src="/blfMarker.png" width="26" height="26" />
+          </span>
+        </button>
         <button
           v-else
           type="button"
           class="btn btn-outline-light btn-lg btn-block"
           @click="openBlfLocations"
-        >BLF</button>
+        >
+          <span>BLF</span>
+          <span class="pl-2">
+            <img src="/blfMarker.png" width="26" height="26" />
+          </span>
+        </button>
       </div>
       <div class="col text-center my-auto mx-auto border-right">
         <button
@@ -292,13 +322,23 @@
           type="button"
           class="btn btn-light btn-lg btn-block"
           @click="openEfLocations"
-        >EF</button>
+        >
+          <span>EF</span>
+          <span class="pl-2">
+            <img src="/efMarker.png" width="26" height="26" />
+          </span>
+        </button>
         <button
           v-else
           type="button"
           class="btn btn-outline-light btn-lg btn-block"
           @click="openEfLocations"
-        >EF</button>
+        >
+          <span>EF</span>
+          <span class="pl-2">
+            <img src="/efMarker.png" width="26" height="26" />
+          </span>
+        </button>
       </div>
       <div class="col text-center my-auto mx-auto" style="z-index: 9999;">
         <button
@@ -306,13 +346,23 @@
           type="button"
           class="btn btn-light btn-lg btn-block"
           @click="openItLocations"
-        >IT</button>
+        >
+          <span>IT</span>
+          <span class="pl-2">
+            <img src="/itMarker.png" width="26" height="26" />
+          </span>
+        </button>
         <button
           v-else
           type="button"
           class="btn btn-outline-light btn-lg btn-block"
           @click="openItLocations"
-        >IT</button>
+        >
+          <span>IT</span>
+          <span class="pl-2">
+            <img src="/itMarker.png" width="26" height="26" />
+          </span>
+        </button>
       </div>
     </div>
   </div>
@@ -345,9 +395,10 @@ const options = {
 export default {
   data() {
     return {
+      loadingBtn: false,
       toggleFactMapGrower: false,
       toggleFactoryMapGrowerLocations: false,
-      toggleFactoryLocations: false,
+      toggleFactoryLocations: true,
       toggleGrowerLocations: false,
       toggleBlfLocations: false,
       toggleEfLocations: false,
@@ -568,9 +619,11 @@ export default {
 
   methods: {
     receiveStates() {
+      this.loadingBtn = true;
       this.axios
         .get("https://teaboardapi.sumato.tech/api/v1/state-list")
         .then(response => {
+          this.loadingBtn = false;
           this.gotStates = response.data.data;
         })
         .catch();

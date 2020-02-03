@@ -8,6 +8,7 @@ import RandomChart from "@/components/RandomChart";
 import DragCharting from "@/components/DragCharting";
 import DragChart from "@/components/DragChart";
 import FullMap from "@/components/FullMap";
+import LoginPage from "@/components/LoginPage";
 
 // import CheckChart from "@/components/CheckChart";
 
@@ -15,6 +16,10 @@ Vue.use(VueRouter);
 
 export default new VueRouter({
   routes: [
+    {
+      path: "/login",
+      component: LoginPage
+    },
     {
       path: "/",
       component: RandomChart

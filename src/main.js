@@ -9,15 +9,19 @@ import "bootstrap-vue/dist/bootstrap-vue.css";
 import axios from "axios";
 import VueAxios from "vue-axios";
 
+import store from "./store";
+
 import CKEditor from "@ckeditor/ckeditor5-vue";
-// import axios from "axios";
 import router from "./router";
+
+import Vuex from "vuex";
 
 Vue.use(CKEditor);
 Vue.use(VueAxios, axios);
+Vue.use(Vuex);
 Vue.use(BootstrapVue);
 // Vue.prototype.axios = window.axios;
-// axios.defaults.baseURL = "http://helloworld.test/api";
+axios.defaults.baseURL = "http://helloworld.test/api";
 Vue.config.productionTip = false;
 import "leaflet/dist/leaflet.css";
 import { Icon } from "leaflet";
@@ -30,5 +34,6 @@ Icon.Default.mergeOptions({
 });
 new Vue({
   router,
+  store,
   render: h => h(App)
 }).$mount("#app");
