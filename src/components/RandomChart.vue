@@ -86,6 +86,7 @@
 
             <b-dropdown-item href="/dragchart" target="_blank">Factory details dashboard</b-dropdown-item>
             <b-dropdown-item href="/fullmap" target="_blank">Factory & Growers Location</b-dropdown-item>
+            <b-dropdown-item href="#" @click.prevent="signOut" target="_blank">Sign Out</b-dropdown-item>
           </b-dropdown>
         </div>
       </div>
@@ -265,6 +266,7 @@
 </template>
 
 <script>
+import { mapActions } from "vuex";
 // import LineChart from "./charts/LineChart.js";
 // import BarChart from "./charts/BarChart.js";
 // import PieChart from "./charts/PieChart.js";
@@ -512,6 +514,16 @@ export default {
     // this.fillDataLine();
   },
   methods: {
+    ...mapActions({
+      signOutAction: "auth/signOut"
+    }),
+    signOut() {
+      this.signOutAction().then(() => {
+        this.$router.replace({
+          name: "login"
+        });
+      });
+    },
     receiveStates() {
       this.loadingBtn = true;
       this.axios

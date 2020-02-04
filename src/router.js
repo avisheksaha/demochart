@@ -9,20 +9,30 @@ import DragCharting from "@/components/DragCharting";
 import DragChart from "@/components/DragChart";
 import FullMap from "@/components/FullMap";
 import LoginPage from "@/components/LoginPage";
+import store from "@/store";
 
 // import CheckChart from "@/components/CheckChart";
 
 Vue.use(VueRouter);
 
-export default new VueRouter({
+const router = new VueRouter({
   routes: [
     {
+      name: "login",
       path: "/login",
       component: LoginPage
     },
     {
+      name: "randomchart",
       path: "/",
-      component: RandomChart
+      component: RandomChart,
+      beforeEnter: (to, from, next) => {
+        if (!store.getters["auth/authenticated"]) {
+          return next({
+            name: "login"
+          });
+        }
+      }
     },
     {
       path: "/article-page/:id",
@@ -56,3 +66,4 @@ export default new VueRouter({
   ],
   mode: "history"
 });
+export default router;

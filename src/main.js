@@ -16,13 +16,7 @@ import router from "./router";
 
 import Vuex from "vuex";
 
-Vue.use(CKEditor);
-Vue.use(VueAxios, axios);
-Vue.use(Vuex);
-Vue.use(BootstrapVue);
-// Vue.prototype.axios = window.axios;
-axios.defaults.baseURL = "http://helloworld.test/api";
-Vue.config.productionTip = false;
+require("@/store/subscriber");
 import "leaflet/dist/leaflet.css";
 import { Icon } from "leaflet";
 delete Icon.Default.prototype._getIconUrl;
@@ -32,8 +26,19 @@ Icon.Default.mergeOptions({
   iconUrl: require("leaflet/dist/images/marker-icon.png"),
   shadowUrl: require("leaflet/dist/images/marker-shadow.png")
 });
-new Vue({
-  router,
-  store,
-  render: h => h(App)
-}).$mount("#app");
+
+Vue.use(CKEditor);
+Vue.use(VueAxios, axios);
+Vue.use(Vuex);
+Vue.use(BootstrapVue);
+// Vue.prototype.axios = window.axios;
+axios.defaults.baseURL = "https://teaboardapi.sumato.tech/api/v1";
+Vue.config.productionTip = false;
+
+store.dispatch("auth/attempt", localStorage.getItem("token")).then(() => {
+  new Vue({
+    router,
+    store,
+    render: h => h(App)
+  }).$mount("#app");
+});
